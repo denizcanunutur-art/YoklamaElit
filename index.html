@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etüt Yoklama Mobil - Gelişmiş</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 10px;
+  background: #ffffff;
+  color: #333;
+}
+
+/* Kurum başlığı */
+#institutionHeader {
+  font-family: 'Georgia', serif;
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #006666;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Tablo */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 20px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 5px solid;
+  border-image: linear-gradient(45deg, #40E0D0, #FFA500) 1;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+button {
+  padding: 7px 12px;
+  margin: 5px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+#bulkBtn {
+  background-color: #28a745;
+  color: white;
+}
+
+/* Etüte katılmayan öğrenciler kutusu */
+#yokList {
+  border: 5px solid;
+  border-image: linear-gradient(45deg, #40E0D0, #FFA500) 1;
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+/* Liste genel */
+#yokOgrenciler {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Modern öğrenci kartı */
+#yokOgrenciler li {
+  list-style: none;
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+  background: #f7f7f7;
+  border-radius: 10px;
+  padding: 15px 25px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  min-width: 180px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#yokOgrenciler li:hover {
+  background: linear-gradient(135deg, #40E0D0, #FFA500);
+  color: white;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+  transform: translateY(-4px);
+}
+
+input[type="radio"] {
+  transform: scale(1.2);
+}
+
+@media (max-width: 600px) {
+  table, th, td {font-size: 14px;}
+  #institutionHeader {font-size: 28px;}
+  #yokOgrenciler li {min-width: 140px; font-size: 14px;}
+}
+</style>
+</head>
+<body>
+
+<script>
+let password = prompt("Siteye girmek için şifreyi girin:");
+if(password !== "elit") {
+  alert("Şifre yanlış! Siteye erişim engellendi.");
+  window.location = "about:blank";
+}
+</script>
+
+<!-- Kurum başlığı -->
+<div id="institutionHeader">ELİT EĞİTİM KURUMU</div>
+
+<h1>Etüt Yoklama Sistemi</h1>
+<button id="bulkBtn">Tüm Yoklara WhatsApp Mesajı Gönder</button>
+
+<table id="studentTable">
+<tr><th>Öğrenci</th><th>Var</th><th>Yok</th></tr>
+</table>
+
+<div id="yokList">
+  <h3>Etüte Katılmayan Öğrenciler</h3>
+  <ul id="yokOgrenciler"></ul>
+</div>
+
+<script>
+let students = [
+  {name:"Deniz", phone:"+905541028944", status:"Var"},
+  {name:"Ahmet Yılmaz", phone:"+90551112233", status:"Var"},
+  {name:"Ayşe Demir", phone:"+90554445566", status:"Var"},
+  {name:"Berk Arslan", phone:"+90556667788", status:"Var"}
+];
+
+function renderTable() {
+  let table = document.getElementById("studentTable");
+  table.innerHTML = "<tr><th>Öğrenci</th><th>Var</th><th>Yok</th></tr>";
+  students.forEach((student, index) => {
+    let row = table.insertRow();
+    row.insertCell(0).innerText = student.name;
+
+    let varCell = row.insertCell(1);
+    let yokCell = row.insertCell(2);
+
+    let varRadio = document.createElement("input");
+    varRadio.type = "radio";
+    varRadio.name = "status_" + index;
+    varRadio.value = "Var";
+    if(student.status=="Var") varRadio.checked=true;
+    varRadio.onclick = ()=> { students[index].status="Var"; renderTable(); };
+    varCell.appendChild(varRadio);
+
+    let yokRadio = document.createElement("input");
+    yokRadio.type = "radio";
+    yokRadio.name = "status_" + index;
+    yokRadio.value = "Yok";
+    if(student.status=="Yok") yokRadio.checked=true;
+    yokRadio.onclick = ()=> { students[index].status="Yok"; renderTable(); };
+    yokCell.appendChild(yokRadio);
+
+    // Satır rengi yoklama durumuna göre
+    row.style.backgroundColor = student.status === "Var" ? "rgba(0,255,0,0.2)" : (student.status === "Yok" ? "rgba(255,0,0,0.2)" : "transparent");
+  });
+
+  // Etüte katılmayan öğrenciler listesi oluştur
+  let yoklar = students.filter(s => s.status === "Yok");
+  let list = document.getElementById("yokOgrenciler");
+  list.innerHTML = "";
+  if (yoklar.length === 0) {
+    list.innerHTML = "<li>Tüm öğrenciler etütte 👏</li>";
+  } else {
+    yoklar.forEach(s => {
+      let li = document.createElement("li");
+      li.innerText = s.name;
+      list.appendChild(li);
+    });
+  }
+}
+
+// Toplu mesaj gönderme
+document.getElementById("bulkBtn").onclick = () => {
+  let yoklar = students.filter(s => s.status=="Yok");
+  yoklar.forEach(s => {
+    let msg = encodeURIComponent("Merhabalar, öğrencimiz etüte katılım sağlamamıştır. Bilginize sunarız.
+Elit Eğitim Kurumları");
+    window.open("https://wa.me/" + s.phone.replace('+','') + "?text=" + msg, "_blank");
+  });
+};
+
+renderTable();
+</script>
+
+</body>
+</html>
