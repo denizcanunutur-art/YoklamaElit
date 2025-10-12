@@ -262,7 +262,7 @@ function renderAbsentTable(){
 }
 
 function sendIndividualWA(phone, name){
-  const msg = `Merhabalar Öğrencimiz ${name}, etüte katılmamıştır bilginize sunarız.%0AElit Eğitim Kurumu`;
+  const msg = `Merhabalar Öğrencimiz ${name} etüte katılmamıştır, bilginize sunarız.%0AElit Eğitim Kurumu`;
   const url = `https://wa.me/${phone.replace(/\+/g,'')}?text=${msg}`;
   window.open(url, "_blank");
 }
