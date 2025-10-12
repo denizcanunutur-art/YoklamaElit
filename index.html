@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Elit Eğitim Kurumu - Yoklama Sistemi</title>
 <style>
-:root{--red:#e74c3c;--blue:#2d6cdf;--green:#25d366;--muted:#f7f7f7;--gray:#7f8c8d;}
+:root{--red:#e74c3c;--blue:#2d6cdf;--green:#25d366;--muted:#f7f7f7;--gray:#bdbdbd;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{
   font-family:"Montserrat",Arial,sans-serif;
-  background:url('IMG_4035.jpeg') center/cover no-repeat;
+  background:url('IMG_4035.JPG') center/cover no-repeat;
   color:#222;
 }
 header{
@@ -32,7 +32,6 @@ thead th{position:sticky;top:0;background:var(--muted);border-bottom:1px solid #
 tbody td{padding:10px;border-bottom:1px solid #f0f0f0;text-align:left}
 tbody tr:hover{background:rgba(0,0,0,0.03)}
 td.name{font-weight:700}
-td:nth-child(2){color:var(--blue);font-weight:700;}
 
 .status-cell{width:110px;text-align:center;cursor:pointer;border-radius:6px;padding:6px;font-weight:700}
 .status-empty{background:transparent;color:#333}
@@ -52,7 +51,7 @@ td:nth-child(2){color:var(--blue);font-weight:700;}
   background:var(--gray);
   color:#fff;
 }
-.btn-class{background:#eee;color:#000;margin:2px;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:700}
+.btn-class{background:#eee;color:var(--blue);margin:2px;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:700}
 
 /* Panel (modal) */
 #overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:40}
@@ -132,6 +131,7 @@ td:nth-child(2){color:var(--blue);font-weight:700;}
 const INSTITUTION_PHONE = "+905527112922";
 
 let activeClassFilter = null;
+
 let students = JSON.parse(localStorage.getItem("studentsData")) || [
   {name:"Berrin Kıllı",class:"11Say",phone:"+9005353617536"},
   {name:"Cemal Tarık Arslanoğlu",class:"11Say",phone:"+9005052575443"},
@@ -184,97 +184,24 @@ let students = JSON.parse(localStorage.getItem("studentsData")) || [
   {name:"Şükrü Kutluhan Erdoğan",class:"11Say",phone:"+9005366769239"}
 ];
 
-let statuses = {};
-
-function renderStudentsTable(){
-  const tbody=document.querySelector("#studentsTable tbody");
-  tbody.innerHTML="";
-  students
-    .filter(s=>!activeClassFilter || s.class===activeClassFilter)
-    .forEach(s=>{
-      const tr=document.createElement("tr");
-      const tdName=document.createElement("td");
-      tdName.textContent=s.name;tdName.className="name";
-      const tdClass=document.createElement("td");
-      tdClass.textContent=s.class;
-      const tdStatus=document.createElement("td");
-      tdStatus.classList.add("status-cell");
-      const status=statuses[s.name]||"";
-      tdStatus.classList.add(status?"status-"+status:"status-empty");
-      tdStatus.textContent=status==="present"?"Var":status==="absent"?"Yok":"-";
-      tdStatus.onclick=()=>{toggleStatus(s.name);};
-      tr.append(tdName,tdClass,tdStatus);
-      tbody.appendChild(tr);
-    });
-  renderAbsentTable();
-}
-
-function toggleStatus(name){
-  const current=statuses[name];
-  if(!current)statuses[name]="absent";
-  else if(current==="absent")statuses[name]="present";
-  else delete statuses[name];
-  renderStudentsTable();
-}
-
-function renderAbsentTable(){
-  const tbody=document.querySelector("#absentTable tbody");
-  tbody.innerHTML="";
-  const absents=students.filter(s=>statuses[s.name]==="absent");
-  absents.forEach(s=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${s.name}</td><td>${s.class}</td>
-      <td><button class="btn btn-wa" onclick="sendWhatsapp('${s.phone}','${s.name}')">Mesaj Gönder</button></td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-function sendWhatsapp(phone,name){
-  const msg=`Merhabalar, öğrencimiz ${name}, etüte katılmamıştır. Bilginize sunarız.%0AElit Eğitim Kurumu`;
-  window.open(`https://wa.me/${phone.replace(/[^0-9]/g,"")}?text=${msg}`,"_blank");
-}
-
-function notifyInstitution(){
-  const absents=students.filter(s=>statuses[s.name]==="absent").map(s=>s.name);
-  if(absents.length===0)return alert("Hiç yok öğrenci bulunmuyor.");
-  const msg="Etütte olmayan öğrenciler:%0A"+absents.join(", ");
-  window.open(`https://wa.me/${INSTITUTION_PHONE.replace(/[^0-9]/g,"")}?text=${msg}`,"_blank");
-}
-
-function openPanel(){document.getElementById("overlay").style.display="block";document.getElementById("panel").style.display="block";}
-function closePanel(){document.getElementById("overlay").style.display="none";document.getElementById("panel").style.display="none";}
-function clearInputs(){document.getElementById("newName").value="";document.getElementById("newClass").value="";document.getElementById("newPhone").value="";}
-function addStudent(){
-  const name=document.getElementById("newName").value.trim();
-  const cls=document.getElementById("newClass").value.trim();
-  const phone=document.getElementById("newPhone").value.trim();
-  if(!name||!cls)return alert("Ad ve sınıf girilmeli!");
-  students.push({name:name,class:cls,phone:phone});
-  localStorage.setItem("studentsData",JSON.stringify(students));
-  renderClassButtons();renderStudentsTable();clearInputs();
-}
-function removeStudent(){
-  const name=document.getElementById("removeName").value.trim();
-  students=students.filter(s=>s.name!==name);
-  localStorage.setItem("studentsData",JSON.stringify(students));
-  renderClassButtons();renderStudentsTable();
-}
+let statuses = {}; 
 
 function renderClassButtons(){
-  const container=document.getElementById("classButtons");
-  container.innerHTML="";
-  const classes=[...new Set(students.map(s=>s.class))].sort();
+  const container = document.getElementById("classButtons");
+  container.innerHTML = "";
+  const classes = [...new Set(students.map(s=>s.class))].sort();
   classes.forEach(cls=>{
-    const btn=document.createElement("button");
-    btn.textContent=cls;
-    btn.className="btn-class";
+    const btn = document.createElement("button");
+    btn.textContent = cls;
+    btn.className = "btn-class";
+    btn.style.color = "var(--blue)";
     if(activeClassFilter===cls){
-      btn.style.backgroundColor="var(--blue)";
-      btn.style.color="#fff";
+      btn.style.backgroundColor = "var(--blue)";
+      btn.style.color = "#fff";
     }
-    btn.addEventListener("click",()=>{
-      if(activeClassFilter===cls) activeClassFilter=null;
-      else activeClassFilter=cls;
+    btn.addEventListener("click", ()=>{
+      if(activeClassFilter===cls) activeClassFilter = null;
+      else activeClassFilter = cls;
       renderStudentsTable();
       renderClassButtons();
     });
@@ -282,6 +209,99 @@ function renderClassButtons(){
   });
 }
 
+function renderStudentsTable(){
+  const tbody = document.querySelector("#studentsTable tbody");
+  tbody.innerHTML = "";
+  students
+    .filter(s => !activeClassFilter || s.class === activeClassFilter)
+    .forEach(s => {
+      const tr = document.createElement("tr");
+      const tdName = document.createElement("td"); tdName.className = "name"; tdName.textContent = s.name;
+      const tdClass = document.createElement("td"); tdClass.textContent = s.class;
+      const tdStatus = document.createElement("td"); tdStatus.className = "status-cell";
+      const st = statuses[s.name] || "";
+      tdStatus.classList.remove("status-empty","status-absent","status-present");
+      if(!st) tdStatus.classList.add("status-empty");
+      else if(st === "absent") tdStatus.classList.add("status-absent");
+      else if(st === "present") tdStatus.classList.add("status-present");
+      tdStatus.textContent = st ? (st==="absent"?"Yok":"Var") : "-";
+      tdStatus.addEventListener("click", ()=>{
+        toggleStatus(s.name);
+      });
+      tr.appendChild(tdName);
+      tr.appendChild(tdClass);
+      tr.appendChild(tdStatus);
+      tbody.appendChild(tr);
+    });
+  renderAbsentTable();
+}
+
+function toggleStatus(name){
+  const cur = statuses[name];
+  if(!cur) statuses[name] = "absent";
+  else if(cur === "absent") statuses[name] = "present";
+  else delete statuses[name];
+  renderStudentsTable();
+}
+
+function renderAbsentTable(){
+  const tbody = document.querySelector("#absentTable tbody");
+  tbody.innerHTML = "";
+  const absents = students.filter(s => statuses[s.name] === "absent");
+  absents.forEach(s=>{
+    const tr = document.createElement("tr");
+    const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent = s.name;
+    const tdClass = document.createElement("td"); tdClass.textContent = s.class;
+    const tdBtn = document.createElement("td"); tdBtn.style.textAlign = "center";
+    const btn = document.createElement("button"); btn.className = "btn btn-wa"; btn.textContent = "Gönder";
+    btn.addEventListener("click", ()=> sendIndividualWA(s.phone, s.name));
+    tdBtn.appendChild(btn);
+    tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdBtn);
+    tbody.appendChild(tr);
+  });
+}
+
+function sendIndividualWA(phone, name){
+  const msg = `Merhabalar Öğrencimiz ${name}, etüte katılmamıştır bilginize sunarız.%0AElit Eğitim Kurumu`;
+  const url = `https://wa.me/${phone.replace(/\+/g,'')}?text=${msg}`;
+  window.open(url, "_blank");
+}
+function notifyInstitution(){
+  const absents = students.filter(s => statuses[s.name] === "absent").map(s=>s.name);
+  if(absents.length === 0){ alert("Tüm öğrenciler etütte, bildirilecek öğrenci yok."); return; }
+  const message = `Etütte olmayan öğrenciler:\n\n${absents.join(", ")}`;
+  const url = `https://wa.me/${INSTITUTION_PHONE.replace(/\+/g,'')}?text=${encodeURIComponent(message)}`;
+  window.open(url, "_blank");
+}
+
+function openPanel(){ document.getElementById("overlay").style.display="block"; document.getElementById("panel").style.display="block"; }
+function closePanel(){ document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none"; }
+function clearInputs(){ document.getElementById("newName").value=""; document.getElementById("newClass").value=""; document.getElementById("newPhone").value=""; }
+
+function addStudent(){
+  const name = document.getElementById("newName").value.trim();
+  const cls = document.getElementById("newClass").value.trim();
+  const phone = document.getElementById("newPhone").value.trim();
+  if(!name || !cls){ alert("Lütfen isim ve sınıf girin."); return; }
+  if(students.some(s => s.name.toLowerCase() === name.toLowerCase())){ alert("Bu isimde öğrenci zaten mevcut."); return; }
+  students.push({name, class: cls, phone: phone});
+  localStorage.setItem("studentsData", JSON.stringify(students));
+  renderClassButtons(); renderStudentsTable(); clearInputs(); closePanel();
+}
+
+function removeStudent(){
+  const name = document.getElementById("removeName") ? document.getElementById("removeName").value.trim() : "";
+  if(!name){ alert("Silinecek öğrencinin adını girin."); return; }
+  const idx = students.findIndex(s => s.name.toLowerCase() === name.toLowerCase());
+  if(idx === -1){ alert("Bu isimde öğrenci bulunamadı."); return; }
+  students.splice(idx,1);
+  localStorage.setItem("studentsData", JSON.stringify(students));
+  renderClassButtons(); renderStudentsTable();
+  if(document.getElementById("removeName")) document.getElementById("removeName").value = "";
+  closePanel();
+}
+
+/* Başlat */
 renderClassButtons();
 renderStudentsTable();
 </script>
