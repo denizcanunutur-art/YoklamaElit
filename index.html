@@ -78,7 +78,9 @@ td.name{font-weight:700}
   <section class="panel" id="yoklamaPanel">
     <h3>Etüt Yoklama Listesi</h3>
     <button class="btn btn-panel" onclick="openPanel()">Öğrenci Ekle / Çıkar</button>
+
     <div id="classButtons"></div>
+
     <div class="table-wrap">
       <table id="studentsTable">
         <thead>
@@ -122,14 +124,15 @@ td.name{font-weight:700}
       <button class="btn btn-danger" onclick="removeStudent()">Sil</button>
       <button class="btn" onclick="closePanel()">Kapat</button>
     </div>
+ remaining
   </div>
 </div>
 
+<!-- Firebase SDK -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
-// Firebase yapılandırma
 const firebaseConfig = {
   apiKey: "AIzaSyBka7ReTV8sGjR9GAsJUDkksLSCTHCV9Mk",
   authDomain: "elit-yoklama.firebaseapp.com",
@@ -144,81 +147,128 @@ const db = getFirestore(app);
 const INSTITUTION_PHONE = "+905527112922";
 let activeClassFilter = null;
 let students = [];
-let statuses = {};
+let statuses = JSON.parse(localStorage.getItem("statuses") || "{}");
 
-// Hazır öğrenci listesi
-const defaultStudents = [
-  {name:"Berrin Kıllı",class:"11Say",phone:"+9005353617536"},
-  {name:"Cemal Tarık Arslanoğlu",class:"11Say",phone:"+9005052575443"},
-  {name:"Emin Dede",class:"11Say",phone:"+9005343968830"},
-  {name:"Esat Çetin",class:"11Say",phone:"+9005386259472"},
-  {name:"Nejla Yalçınkaya",class:"11Say",phone:"+9005322557853"},
-  {name:"Pervingül Çevik",class:"11Say",phone:"+9005303286038"},
-  {name:"Safiye Kılıç",class:"11Say",phone:"+9005386516535"},
-  {name:"Ahmet Burak Altın",class:"12Say",phone:"+9005339783697"},
-  {name:"Anıl Boşnak",class:"12Say",phone:"+9005386100285"},
-  {name:"Elif Ateş",class:"12Say",phone:"+9005305022614"},
-  {name:"Erdem Durmaz",class:"12Say",phone:"+9005414600448"},
-  {name:"İbrahim Efe Akbulut",class:"12Say",phone:"+9005335404272"},
-  {name:"İkbal Demir",class:"12Say",phone:"+9005380151908"},
-  {name:"İrem Karaduman",class:"12Say",phone:"+9005357762841"},
-  {name:"Müfide Karaoğlu",class:"12Say",phone:"+9005074454962"},
-  {name:"Tülay Pekbalcı",class:"12Say",phone:"+9005337313907"},
-  {name:"Ali Akgöbek",class:"12Tm",phone:"+9005428051761"},
-  {name:"Buse Özen",class:"12Tm",phone:"+9005325227407"},
-  {name:"Ecrin Böke",class:"12Tm",phone:"+9005326464499"},
-  {name:"Irmak Gürcüoğlu",class:"12Tm",phone:"+9005549517677"},
-  {name:"İlayda Çelik",class:"12Tm",phone:"+9005334097897"},
-  {name:"Kerim Tolga Denizci",class:"12Tm",phone:"+9005427272781"},
-  {name:"Semranur Gümüş",class:"12Tm",phone:"+9005343700550"},
-  {name:"Buse Kurt",class:"MezunSay",phone:"+9005302331071"},
-  {name:"Dicle Göktürk",class:"MezunSay",phone:"+9005364010140"},
-  {name:"İrem Karakozak",class:"MezunSay",phone:"+9005302366900"},
-  {name:"Mehmet Talha Özhan",class:"MezunSay",phone:"+9005345520407"},
-  {name:"Semih Kodaz",class:"MezunSay",phone:"+9005374230568"},
-  {name:"Berrak Gül",class:"MezunTm",phone:"+9005306303848"},
-  {name:"Fatma Özdemir",class:"MezunTm",phone:"+9005358788975"},
-  {name:"Furkan Ak",class:"MezunTm",phone:"+9005522961327"},
-  {name:"Halil Kıssa",class:"MezunTm",phone:"+9005301600338"},
-  {name:"Merve Naz Çetin",class:"MezunTm",phone:"+9005395554276"},
-  {name:"Muhammet Demir",class:"MezunTm",phone:"+9005389457983"},
-  {name:"Serhat Akdoğan",class:"MezunTm",phone:"+9005397735951"},
-  {name:"Zübeyde Baven Çelik",class:"MezunTm",phone:"+9005302330947"},
-  {name:"İrem Azgın",class:"MezunTm",phone:"+9005363155409"},
-  {name:"Emre Yıldız",class:"MezunTm",phone:"+9005426342695"},
-  {name:"Osman Özaslan",class:"MezunTm",phone:"+9005355629403"},
-  {name:"Melike Gökdeniz",class:"MezunSay",phone:"+9005457138496"},
-  {name:"Berkay Çolak",class:"MezunSay",phone:"+9005326239883"},
-  {name:"Burak Şirikoğlu",class:"MezunSay",phone:"+9005326079880"},
-  {name:"Dilara Karaduman",class:"MezunSay",phone:"+9005345127785"},
-  {name:"Berkay Kılınç",class:"11Say",phone:"+9005326779673"},
-  {name:"Emir Can Mullaoğlu",class:"MezunTm",phone:"+9005534811612"},
-  {name:"Selehattin Bayrak",class:"11Say",phone:"+9005438291814"},
-  {name:"Ömer Bucak",class:"11Say",phone:"+9005057692663"},
-  {name:"Dilan Aydoğan",class:"MezunSay",phone:"+9005412515729"},
-  {name:"Şükrü Kutluhan Erdoğan",class:"11Say",phone:"+9005366769239"}
-];
-
-// Firestore’dan öğrenci yükle, yoksa default ekle
-async function loadStudents(){
-  const studentsCol = collection(db,"students");
-  const querySnapshot = await getDocs(studentsCol);
-  if(querySnapshot.empty){
-    for(const s of defaultStudents){
-      const docRef = await addDoc(studentsCol,s);
-      students.push({...s,id:docRef.id});
-    }
-  } else {
-    querySnapshot.forEach(docSnap=>{
-      students.push({...docSnap.data(),id:docSnap.id});
-    });
-  }
+async function loadStudents() {
+  const snapshot = await getDocs(collection(db,"students"));
+  students = snapshot.docs.map(d => ({id:d.id,...d.data()}));
   renderClassButtons();
   renderStudentsTable();
 }
 
-/* --- Render, add/remove, toggleStatus, WhatsApp fonksiyonları --- */
-/* Aynı önceki sürümdeki tüm fonksiyonları buraya kopyala ve Firestore entegrasyonu için addStudent/removeStudent içini güncelle */
+function renderClassButtons(){
+  const container = document.getElementById("classButtons");
+  container.innerHTML = "";
+  const classes = [...new Set(students.map(s=>s.class))].sort();
+  classes.forEach(cls=>{
+    const btn = document.createElement("button");
+    btn.textContent = cls;
+    btn.className = "btn-class";
+    btn.style.color = "var(--blue)";
+    if(activeClassFilter===cls){
+      btn.style.backgroundColor = "var(--blue)";
+      btn.style.color = "#fff";
+    }
+    btn.addEventListener("click", ()=>{
+      activeClassFilter = activeClassFilter===cls ? null : cls;
+      renderStudentsTable();
+      renderClassButtons();
+    });
+    container.appendChild(btn);
+  });
+}
+
+function renderStudentsTable(){
+  const tbody = document.querySelector("#studentsTable tbody");
+  tbody.innerHTML = "";
+  students
+    .filter(s => !activeClassFilter || s.class === activeClassFilter)
+    .forEach(s => {
+      const tr = document.createElement("tr");
+      const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent = s.name;
+      const tdClass = document.createElement("td"); tdClass.textContent = s.class;
+      const tdStatus = document.createElement("td"); tdStatus.className="status-cell";
+      const st = statuses[s.id] || "";
+      tdStatus.classList.remove("status-empty","status-absent","status-present");
+      if(!st) tdStatus.classList.add("status-empty");
+      else if(st==="absent") tdStatus.classList.add("status-absent");
+      else if(st==="present") tdStatus.classList.add("status-present");
+      tdStatus.textContent = st ? (st==="absent"?"Yok":"Var") : "-";
+      tdStatus.addEventListener("click", ()=>{
+        toggleStatus(s.id);
+      });
+      tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
+      tbody.appendChild(tr);
+    });
+  renderAbsentTable();
+  localStorage.setItem("statuses",JSON.stringify(statuses));
+}
+
+function toggleStatus(id){
+  const cur = statuses[id];
+  if(!cur) statuses[id]="absent";
+  else if(cur==="absent") statuses[id]="present";
+  else delete statuses[id];
+  renderStudentsTable();
+}
+
+function renderAbsentTable(){
+  const tbody = document.querySelector("#absentTable tbody");
+  tbody.innerHTML = "";
+  const absents = students.filter(s => statuses[s.id]==="absent");
+  absents.forEach(s=>{
+    const tr = document.createElement("tr");
+    const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent = s.name;
+    const tdClass = document.createElement("td"); tdClass.textContent = s.class;
+    const tdBtn = document.createElement("td"); tdBtn.style.textAlign="center";
+    const btn = document.createElement("button"); btn.className="btn btn-wa"; btn.textContent="Gönder";
+    btn.addEventListener("click", ()=> sendIndividualWA(s.phone, s.name));
+    tdBtn.appendChild(btn);
+    tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdBtn);
+    tbody.appendChild(tr);
+  });
+}
+
+function sendIndividualWA(phone,name){
+  const msg = `Merhabalar Öğrencimiz ${name} etüte katılmamıştır, bilginize sunarız.%0AElit Eğitim Kurumu`;
+  const url = `https://wa.me/${phone.replace(/\+/g,'')}?text=${msg}`;
+  window.open(url,"_blank");
+}
+
+function notifyInstitution(){
+  const absents = students.filter(s=>statuses[s.id]==="absent").map(s=>s.name);
+  if(absents.length===0){ alert("Tüm öğrenciler etütte, bildirilecek öğrenci yok."); return; }
+  const message = `Etütte olmayan öğrenciler:\n\n${absents.join(", ")}`;
+  const url = `https://wa.me/${INSTITUTION_PHONE.replace(/\+/g,'')}?text=${encodeURIComponent(message)}`;
+  window.open(url,"_blank");
+}
+
+function openPanel(){ document.getElementById("overlay").style.display="block"; document.getElementById("panel").style.display="block"; }
+function closePanel(){ document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none"; }
+function clearInputs(){ document.getElementById("newName").value=""; document.getElementById("newClass").value=""; document.getElementById("newPhone").value=""; }
+
+async function addStudent(){
+  const name = document.getElementById("newName").value.trim();
+  const cls = document.getElementById("newClass").value.trim();
+  const phone = document.getElementById("newPhone").value.trim();
+  if(!name||!cls){ alert("Lütfen isim ve sınıf girin."); return; }
+  const docRef = await addDoc(collection(db,"students"),{name, class:cls, phone});
+  students.push({id:docRef.id,name, class:cls, phone});
+  renderClassButtons(); renderStudentsTable(); clearInputs(); closePanel();
+}
+
+async function removeStudent(){
+  const name = document.getElementById("removeName").value.trim();
+  if(!name){ alert("Silinecek öğrencinin adını girin."); return; }
+  const student = students.find(s=>s.name.toLowerCase()===name.toLowerCase());
+  if(!student){ alert("Bu isimde öğrenci bulunamadı."); return; }
+  await deleteDoc(doc(db,"students",student.id));
+  students = students.filter(s=>s.id!==student.id);
+  delete statuses[student.id];
+  renderClassButtons(); renderStudentsTable();
+  document.getElementById("removeName").value="";
+  closePanel();
+}
 
 loadStudents();
 </script>
