@@ -1,207 +1,309 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Etüt Yoklama Mobil - Gelişmiş</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Elit Eğitim Kurumu - Yoklama Sistemi</title>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  padding: 10px;
-  background: #ffffff;
-  color: #333;
+:root{--red:#e74c3c;--blue:#2d6cdf;--green:#25d366;--muted:#f7f7f7;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family: "Montserrat", Arial, sans-serif;
+  background: url('IMG_4035.JPG') center/cover no-repeat;
+  color:#222;
 }
-
-/* Kurum başlığı */
-#institutionHeader {
-  font-family: 'Georgia', serif;
-  font-size: 36px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #006666;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+header{
+  background: rgba(255,255,255,0.92);
+  padding:20px 12px;
+  text-align:center;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
 }
+header h1{margin:0;font-size:28px;font-weight:800}
+header h1 span{color:var(--red)}
+header h2{margin:6px 0 0 0;font-size:15px;color:#555;font-weight:600}
 
-/* Tablo */
-table {
-  border-collapse: collapse;
-  width: 100%;
-  margin-bottom: 20px;
-  background: #ffffff;
-  border-radius: 10px;
-  border: 5px solid;
-  border-image: linear-gradient(45deg, #40E0D0, #FFA500) 1;
-}
+main{display:flex;gap:18px;padding:18px;flex-wrap:wrap;justify-content:center}
+.panel{background:rgba(255,255,255,0.96);border-radius:10px;padding:14px;box-shadow:0 6px 20px rgba(0,0,0,0.05);flex:1 1 420px;min-width:300px;position:relative}
+h3{margin:0 0 10px 0;font-size:18px}
 
-th, td {
-  border: 1px solid #ccc;
-  padding: 8px;
-}
+.table-wrap{max-height:440px;overflow-y:auto;overflow-x:hidden;border-radius:6px;border:1px solid #e6e6e6;background:#fff}
+table{width:100%;border-collapse:collapse;min-width:300px}
+thead th{position:sticky;top:0;background:var(--muted);border-bottom:1px solid #e6e6e6;padding:10px;font-weight:700;text-align:left}
+tbody td{padding:10px;border-bottom:1px solid #f0f0f0;text-align:left}
+tbody tr:hover{background:rgba(0,0,0,0.03)}
+td.name{font-weight:700}
 
-button {
-  padding: 7px 12px;
-  margin: 5px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.3s;
-}
+.status-cell{width:110px;text-align:center;cursor:pointer;border-radius:6px;padding:6px;font-weight:700}
+.status-empty{background:transparent;color:#333}
+.status-absent{background:#ffd8d8;color:#800}
+.status-present{background:#d6ffd9;color:#064}
 
-button:hover {
-  transform: scale(1.05);
-}
+/* Buttons */
+.btn{display:inline-block;padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-danger{background:#ff6b6b;color:#fff}
+.btn-wa{background:var(--green);color:#fff}
+.btn-notify{background:#4a69bd;color:#fff;margin-bottom:10px}
+.btn-panel{position:absolute;right:14px;top:14px}
 
-#bulkBtn {
-  background-color: #28a745;
-  color: white;
-}
+/* Panel (modal) */
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:40}
+#panel{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;width:92%;max-width:520px}
+#panel .panel-inner{background:#fff;padding:18px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.2)}
+.panel-inner input{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #dcdcdc}
 
-/* Etüte katılmayan öğrenciler kutusu */
-#yokList {
-  border: 5px solid;
-  border-image: linear-gradient(45deg, #40E0D0, #FFA500) 1;
-  padding: 15px;
-  margin-top: 20px;
-  border-radius: 10px;
-  background: #ffffff;
-}
-
-/* Liste genel */
-#yokOgrenciler {
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-}
-
-/* Modern öğrenci kartı */
-#yokOgrenciler li {
-  list-style: none;
-  font-weight: bold;
-  font-size: 16px;
-  color: #333;
-  background: #f7f7f7;
-  border-radius: 10px;
-  padding: 15px 25px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
-  min-width: 180px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#yokOgrenciler li:hover {
-  background: linear-gradient(135deg, #40E0D0, #FFA500);
-  color: white;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.25);
-  transform: translateY(-4px);
-}
-
-input[type="radio"] {
-  transform: scale(1.2);
-}
-
-@media (max-width: 600px) {
-  table, th, td {font-size: 14px;}
-  #institutionHeader {font-size: 28px;}
-  #yokOgrenciler li {min-width: 140px; font-size: 14px;}
+@media (max-width:900px){
+  main{flex-direction:column;padding:12px}
+  .table-wrap{max-height:320px}
 }
 </style>
 </head>
 <body>
 
-<script>
-let password = prompt("Siteye girmek için şifreyi girin:");
-if(password !== "elit") {
-  alert("Şifre yanlış! Siteye erişim engellendi.");
-  window.location = "about:blank";
-}
-</script>
+<header>
+  <h1><span>Elit</span> Eğitim Kurumu</h1>
+  <h2>Yoklama Alma Sistemi</h2>
+</header>
 
-<!-- Kurum başlığı -->
-<div id="institutionHeader">ELİT EĞİTİM KURUMU</div>
+<main>
+  <!-- Sınıf filtre butonları -->
+  <section class="panel">
+    <h3>Sınıflar</h3>
+    <div id="classButtons" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+  </section>
 
-<h1>Etüt Yoklama Sistemi</h1>
-<button id="bulkBtn">Tüm Yoklara WhatsApp Mesajı Gönder</button>
+  <!-- Yoklama listesi -->
+  <section class="panel" id="yoklamaPanel">
+    <h3>Etüt Yoklama Listesi</h3>
+    <button class="btn btn-primary btn-panel" onclick="openPanel()">Öğrenci Ekle / Çıkar</button>
 
-<table id="studentTable">
-<tr><th>Öğrenci</th><th>Var</th><th>Yok</th></tr>
-</table>
+    <div class="table-wrap">
+      <table id="studentsTable">
+        <thead>
+          <tr><th>İsim</th><th>Sınıf</th><th>Durum</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
 
-<div id="yokList">
-  <h3>Etüte Katılmayan Öğrenciler</h3>
-  <ul id="yokOgrenciler"></ul>
+  <!-- Etütte olmayanlar -->
+  <section class="panel">
+    <h3>Etütte Olmayanlar</h3>
+    <button class="btn btn-notify" onclick="notifyInstitution()">Kurumu Bilgilendir</button>
+    <div style="height:8px"></div>
+    <div class="table-wrap">
+      <table id="absentTable">
+        <thead><tr><th>İsim</th><th>Sınıf</th><th>WhatsApp</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<div id="overlay" onclick="closePanel()"></div>
+<div id="panel" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="panel-inner">
+    <h3>Öğrenci Yönetimi</h3>
+    <input id="newName" type="text" placeholder="Ad Soyad" />
+    <input id="newClass" type="text" placeholder="Sınıf (örn: 11Say)" />
+    <input id="newPhone" type="text" placeholder="Telefon (örn +90...)" />
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-primary" onclick="addStudent()">Ekle</button>
+      <button class="btn" onclick="clearInputs()">Temizle</button>
+    </div>
+    <hr style="margin:12px 0">
+    <div style="font-weight:700;margin-bottom:6px">Öğrenci Sil</div>
+    <input id="removeName" type="text" placeholder="Silinecek öğrenci adı" />
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-danger" onclick="removeStudent()">Sil</button>
+      <button class="btn" onclick="closePanel()">Kapat</button>
+    </div>
+  </div>
 </div>
 
 <script>
-let students = [
-  {name:"Deniz", phone:"+905541028944", status:"Var"},
-  {name:"Ahmet Yılmaz", phone:"+90551112233", status:"Var"},
-  {name:"Ayşe Demir", phone:"+90554445566", status:"Var"},
-  {name:"Berk Arslan", phone:"+90556667788", status:"Var"}
+const INSTITUTION_PHONE = "+905527112922";
+const DEFAULT_STUDENTS = [
+  {name:"Berrin Kıllı",class:"11Say",phone:"+9005353617536"},
+  {name:"Cemal Tarık Arslanoğlu",class:"11Say",phone:"+9005052575443"},
+  {name:"Emin Dede",class:"11Say",phone:"+9005343968830"},
+  {name:"Esat Çetin",class:"11Say",phone:"+9005386259472"},
+  {name:"Nejla Yalçınkaya",class:"11Say",phone:"+9005322557853"},
+  {name:"Pervingül Çevik",class:"11Say",phone:"+9005303286038"},
+  {name:"Safiye Kılıç",class:"11Say",phone:"+9005386516535"},
+  {name:"Ahmet Burak Altın",class:"12Say",phone:"+9005339783697"},
+  {name:"Anıl Boşnak",class:"12Say",phone:"+9005386100285"},
+  {name:"Elif Ateş",class:"12Say",phone:"+9005305022614"},
+  {name:"Erdem Durmaz",class:"12Say",phone:"+9005414600448"},
+  {name:"İbrahim Efe Akbulut",class:"12Say",phone:"+9005335404272"},
+  {name:"İkbal Demir",class:"12Say",phone:"+9005380151908"},
+  {name:"İrem Karaduman",class:"12Say",phone:"+9005357762841"},
+  {name:"Müfide Karaoğlu",class:"12Say",phone:"+9005074454962"},
+  {name:"Tülay Pekbalcı",class:"12Say",phone:"+9005337313907"},
+  {name:"Ali Akgöbek",class:"12Tm",phone:"+9005428051761"},
+  {name:"Buse Özen",class:"12Tm",phone:"+9005325227407"},
+  {name:"Ecrin Böke",class:"12Tm",phone:"+9005326464499"},
+  {name:"Irmak Gürcüoğlu",class:"12Tm",phone:"+9005549517677"},
+  {name:"İlayda Çelik",class:"12Tm",phone:"+9005334097897"},
+  {name:"Kerim Tolga Denizci",class:"12Tm",phone:"+9005427272781"},
+  {name:"Semranur Gümüş",class:"12Tm",phone:"+9005343700550"},
+  {name:"Buse Kurt",class:"MezunSay",phone:"+9005302331071"},
+  {name:"Dicle Göktürk",class:"MezunSay",phone:"+9005364010140"},
+  {name:"İrem Karakozak",class:"MezunSay",phone:"+9005302366900"},
+  {name:"Mehmet Talha Özhan",class:"MezunSay",phone:"+9005345520407"},
+  {name:"Semih Kodaz",class:"MezunSay",phone:"+9005374230568"},
+  {name:"Berrak Gül",class:"MezunTm",phone:"+9005306303848"},
+  {name:"Fatma Özdemir",class:"MezunTm",phone:"+9005358788975"},
+  {name:"Furkan Ak",class:"MezunTm",phone:"+9005522961327"},
+  {name:"Halil Kıssa",class:"MezunTm",phone:"+9005301600338"},
+  {name:"Merve Naz Çetin",class:"MezunTm",phone:"+9005395554276"},
+  {name:"Muhammet Demir",class:"MezunTm",phone:"+9005389457983"},
+  {name:"Serhat Akdoğan",class:"MezunTm",phone:"+9005397735951"},
+  {name:"Zübeyde Baven Çelik",class:"MezunTm",phone:"+9005302330947"},
+  {name:"İrem Azgın",class:"MezunTm",phone:"+9005363155409"},
+  {name:"Emre Yıldız",class:"MezunTm",phone:"+9005426342695"},
+  {name:"Osman Özaslan",class:"MezunTm",phone:"+9005355629403"},
+  {name:"Melike Gökdeniz",class:"MezunSay",phone:"+9005457138496"},
+  {name:"Berkay Çolak",class:"MezunSay",phone:"+9005326239883"},
+  {name:"Burak Şirikoğlu",class:"MezunSay",phone:"+9005326079880"},
+  {name:"Dilara Karaduman",class:"MezunSay",phone:"+9005345127785"},
+  {name:"Berkay Kılınç",class:"11Say",phone:"+9005326779673"},
+  {name:"Emir Can Mullaoğlu",class:"MezunTm",phone:"+9005534811612"},
+  {name:"Selehattin Bayrak",class:"11Say",phone:"+9005438291814"},
+  {name:"Ömer Bucak",class:"11Say",phone:"+9005057692663"},
+  {name:"Dilan Aydoğan",class:"MezunSay",phone:"+9005412515729"},
+  {name:"Şükrü Kutluhan Erdoğan",class:"11Say",phone:"+9005366769239"}
 ];
 
-function renderTable() {
-  let table = document.getElementById("studentTable");
-  table.innerHTML = "<tr><th>Öğrenci</th><th>Var</th><th>Yok</th></tr>";
-  students.forEach((student, index) => {
-    let row = table.insertRow();
-    row.insertCell(0).innerText = student.name;
+const STORAGE_KEY = 'elit_students_list_v4';
+let students = loadStudents();
+let absentNames = [];
+let currentClassFilter = null;
 
-    let varCell = row.insertCell(1);
-    let yokCell = row.insertCell(2);
-
-    let varRadio = document.createElement("input");
-    varRadio.type = "radio";
-    varRadio.name = "status_" + index;
-    varRadio.value = "Var";
-    if(student.status=="Var") varRadio.checked=true;
-    varRadio.onclick = ()=> { students[index].status="Var"; renderTable(); };
-    varCell.appendChild(varRadio);
-
-    let yokRadio = document.createElement("input");
-    yokRadio.type = "radio";
-    yokRadio.name = "status_" + index;
-    yokRadio.value = "Yok";
-    if(student.status=="Yok") yokRadio.checked=true;
-    yokRadio.onclick = ()=> { students[index].status="Yok"; renderTable(); };
-    yokCell.appendChild(yokRadio);
-
-    // Satır rengi yoklama durumuna göre
-    row.style.backgroundColor = student.status === "Var" ? "rgba(0,255,0,0.2)" : (student.status === "Yok" ? "rgba(255,0,0,0.2)" : "transparent");
-  });
-
-  // Etüte katılmayan öğrenciler listesi oluştur
-  let yoklar = students.filter(s => s.status === "Yok");
-  let list = document.getElementById("yokOgrenciler");
-  list.innerHTML = "";
-  if (yoklar.length === 0) {
-    list.innerHTML = "<li>Tüm öğrenciler etütte 👏</li>";
-  } else {
-    yoklar.forEach(s => {
-      let li = document.createElement("li");
-      li.innerText = s.name;
-      list.appendChild(li);
-    });
-  }
+function loadStudents(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      return parsed.map(s => ({name:s.name,class:s.class,phone:s.phone,status:""}));
+    }
+  }catch(e){}
+  return DEFAULT_STUDENTS.map(s => ({name:s.name,class:s.class,phone:s.phone,status:""}));
+}
+function saveStudents(){
+  const toSave = students.map(({name,class:cls,phone}) => ({name, class:cls, phone}));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
 }
 
-// Toplu mesaj gönderme
-document.getElementById("bulkBtn").onclick = () => {
-  let yoklar = students.filter(s => s.status=="Yok");
-  yoklar.forEach(s => {
-    let msg = encodeURIComponent("Merhabalar, öğrencimiz etüte katılım sağlamamıştır. Bilginize sunarız.
-Elit Eğitim Kurumları");
-    window.open("https://wa.me/" + s.phone.replace('+','') + "?text=" + msg, "_blank");
+/* Render */
+function renderClassButtons() {
+  const classButtonsContainer = document.getElementById("classButtons");
+  classButtonsContainer.innerHTML = "";
+  const classes = [...new Set(students.map(s => s.class))].sort();
+  const btnAll = document.createElement("button");
+  btnAll.className = "btn btn-primary";
+  btnAll.textContent = "Tüm Sınıflar";
+  btnAll.addEventListener("click", () => { currentClassFilter = null; renderStudentsTable(); });
+  classButtonsContainer.appendChild(btnAll);
+  classes.forEach(cls => {
+    const btn = document.createElement("button");
+    btn.className = "btn btn-primary";
+    btn.textContent = cls;
+    btn.addEventListener("click", () => { currentClassFilter = cls; renderStudentsTable(); });
+    classButtonsContainer.appendChild(btn);
   });
-};
+}
 
-renderTable();
+function renderStudentsTable(){
+  const tbody = document.querySelector("#studentsTable tbody");
+  tbody.innerHTML = "";
+  students.forEach((s)=>{
+    if(currentClassFilter && s.class !== currentClassFilter) return;
+    const tr = document.createElement("tr");
+    const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
+    const tdClass = document.createElement("td"); tdClass.textContent=s.class;
+    const tdStatus = document.createElement("td"); tdStatus.className="status-cell";
+    tdStatus.textContent = s.status ? (s.status==="yok"?"Yok":"Var") : "-";
+    tdStatus.classList.remove("status-empty","status-absent","status-present");
+    if(!s.status) tdStatus.classList.add("status-empty");
+    else if(s.status==="yok") tdStatus.classList.add("status-absent");
+    else tdStatus.classList.add("status-present");
+
+    tdStatus.addEventListener("click", ()=>{
+      if(!s.status) s.status="yok";
+      else if(s.status==="yok") s.status="var";
+      else s.status="";
+      updateAbsentList();
+      renderStudentsTable();
+      renderAbsentTable();
+    });
+
+    tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
+    tbody.appendChild(tr);
+  });
+}
+
+function updateAbsentList(){
+  absentNames = students.filter(s=>s.status==="yok").map(s=>s.name);
+}
+
+function renderAbsentTable(){
+  const tbody = document.querySelector("#absentTable tbody");
+  tbody.innerHTML = "";
+  absentNames.forEach(name=>{
+    const st = students.find(s=>s.name===name); if(!st) return;
+    const tr=document.createElement("tr");
+    const tdName=document.createElement("td"); tdName.className="name"; tdName.textContent=st.name;
+    const tdClass=document.createElement("td"); tdClass.textContent=st.class;
+    const tdBtn=document.createElement("td"); tdBtn.style.textAlign="center";
+    const btn=document.createElement("button"); btn.className="btn btn-wa"; btn.textContent="Gönder";
+    btn.addEventListener("click",()=>sendIndividualWA(st.phone,st.name));
+    tdBtn.appendChild(btn);
+    tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdBtn);
+    tbody.appendChild(tr);
+  });
+}
+
+/* WhatsApp */
+function sendIndividualWA(phone,name){
+  const msg=`Merhabalar Öğrencimiz ${name}, etüte katılmamıştır bilginize sunarız.%0AElit Eğitim Kurumu`;
+  const url=`https://wa.me/${phone.replace(/\+/g,'')}?text=${msg}`;
+  window.open(url,"_blank");
+}
+function notifyInstitution(){
+  if(absentNames.length===0){alert("Tüm öğrenciler etütte, bildirilecek öğrenci yok.");return;}
+  const namesJoined = absentNames.join(", ");
+  const message = `Etütte olmayan öğrenciler:\n\n${namesJoined}`;
+  const url=`https://wa.me/${INSTITUTION_PHONE.replace(/\+/g,'')}?text=${encodeURIComponent(message)}`;
+  window.open(url,"_blank");
+}
+
+/* Panel */
+function openPanel(){document.getElementById("overlay").style.display="block";document.getElementById("panel").style.display="block";document.getElementById("panel").setAttribute("aria-hidden","false");}
+function closePanel(){document.getElementById("overlay").style.display="none";document.getElementById("panel").style.display="none";document.getElementById("panel").setAttribute("aria-hidden","true");}
+function clearInputs(){document.getElementById("newName").value="";document.getElementById("newClass").value="";document.getElementById("newPhone").value="";}
+
+function addStudent(){
+  const name=document.getElementById("newName").value.trim();
+  const cls=document.getElementById("newClass").value.trim();
+  const phone=document.getElementById("newPhone").value.trim();
+  if(!name||!cls||!phone){alert("Lütfen tüm alanları doldurun (isim, sınıf, telefon).");return;}
+  if(students.some(s=>s.name.toLowerCase()===name.toLowerCase())){alert("Bu isimde bir öğrenci zaten mevcut.");return;}
+  students.push({name,class:cls,phone,status:""});
+  saveStudents();
+  updateAbsentList(); renderStudentsTable(); renderAbsentTable(); clearInputs(); closePanel();
+}
+function removeStudent(){
+  const name=document.getElementById("removeName").value.trim();
+  if(!name){alert("Silinecek öğrencinin adını girin.");return;}
+  const idx=students.findIndex(s=>s.name.toLowerCase()===name.toLowerCase());
+  if(idx===-1){alert("Bu isimde öğrenci bulunamadı.");return;}
+  students.splice(idx,1); saveStudents(); updateAbsentList(); renderStudentsTable(); renderAbsentTable(); document.getElementById("removeName").value=""; closePanel();
+}
+
+/* Başlat */
+updateAbsentList(); renderClassButtons(); renderStudentsTable(); renderAbsentTable();
 </script>
 
 </body>
