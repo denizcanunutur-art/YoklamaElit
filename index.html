@@ -9,7 +9,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{
   font-family: "Montserrat", Arial, sans-serif;
-  background: url('IMG_4035.jpeg') center/cover no-repeat;
+  background: url('IMG_4035.JPG') center/cover no-repeat;
   color:#222;
 }
 header{
@@ -52,6 +52,11 @@ td.name{font-weight:700}
 #panel .panel-inner{background:#fff;padding:18px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.2)}
 .panel-inner input{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #dcdcdc}
 
+/* Sınıf filtre butonları */
+#classButtons{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0}
+#classButtons .btn{padding:4px 8px;font-size:13px;white-space:nowrap;height:28px;}
+
+/* Mobil uyum */
 @media (max-width:900px){
   main{flex-direction:column;padding:12px}
   .table-wrap{max-height:320px}
@@ -66,17 +71,16 @@ td.name{font-weight:700}
 </header>
 
 <main>
-  <!-- Sınıf filtre butonları -->
-  <section class="panel">
+  <!-- Sınıf filtre -->
+  <section class="panel" style="padding:10px">
     <h3>Sınıflar</h3>
-    <div id="classButtons" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+    <div id="classButtons"></div>
   </section>
 
   <!-- Yoklama listesi -->
   <section class="panel" id="yoklamaPanel">
     <h3>Etüt Yoklama Listesi</h3>
     <button class="btn btn-primary btn-panel" onclick="openPanel()">Öğrenci Ekle / Çıkar</button>
-
     <div class="table-wrap">
       <table id="studentsTable">
         <thead>
@@ -124,6 +128,7 @@ td.name{font-weight:700}
 
 <script>
 const INSTITUTION_PHONE = "+905527112922";
+
 const DEFAULT_STUDENTS = [
   {name:"Berrin Kıllı",class:"11Say",phone:"+9005353617536"},
   {name:"Cemal Tarık Arslanoğlu",class:"11Say",phone:"+9005052575443"},
@@ -179,7 +184,6 @@ const DEFAULT_STUDENTS = [
 const STORAGE_KEY = 'elit_students_list_v4';
 let students = loadStudents();
 let absentNames = [];
-let currentClassFilter = null;
 
 function loadStudents(){
   try{
@@ -197,29 +201,10 @@ function saveStudents(){
 }
 
 /* Render */
-function renderClassButtons() {
-  const classButtonsContainer = document.getElementById("classButtons");
-  classButtonsContainer.innerHTML = "";
-  const classes = [...new Set(students.map(s => s.class))].sort();
-  const btnAll = document.createElement("button");
-  btnAll.className = "btn btn-primary";
-  btnAll.textContent = "Tüm Sınıflar";
-  btnAll.addEventListener("click", () => { currentClassFilter = null; renderStudentsTable(); });
-  classButtonsContainer.appendChild(btnAll);
-  classes.forEach(cls => {
-    const btn = document.createElement("button");
-    btn.className = "btn btn-primary";
-    btn.textContent = cls;
-    btn.addEventListener("click", () => { currentClassFilter = cls; renderStudentsTable(); });
-    classButtonsContainer.appendChild(btn);
-  });
-}
-
 function renderStudentsTable(){
   const tbody = document.querySelector("#studentsTable tbody");
   tbody.innerHTML = "";
   students.forEach((s)=>{
-    if(currentClassFilter && s.class !== currentClassFilter) return;
     const tr = document.createElement("tr");
     const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
     const tdClass = document.createElement("td"); tdClass.textContent=s.class;
@@ -292,18 +277,37 @@ function addStudent(){
   if(students.some(s=>s.name.toLowerCase()===name.toLowerCase())){alert("Bu isimde bir öğrenci zaten mevcut.");return;}
   students.push({name,class:cls,phone,status:""});
   saveStudents();
-  updateAbsentList(); renderStudentsTable(); renderAbsentTable(); clearInputs(); closePanel();
+  updateAbsentList(); renderStudentsTable(); renderAbsentTable(); clearInputs(); closePanel(); renderClassButtons();
 }
 function removeStudent(){
   const name=document.getElementById("removeName").value.trim();
   if(!name){alert("Silinecek öğrencinin adını girin.");return;}
   const idx=students.findIndex(s=>s.name.toLowerCase()===name.toLowerCase());
   if(idx===-1){alert("Bu isimde öğrenci bulunamadı.");return;}
-  students.splice(idx,1); saveStudents(); updateAbsentList(); renderStudentsTable(); renderAbsentTable(); document.getElementById("removeName").value=""; closePanel();
+  students.splice(idx,1); saveStudents(); updateAbsentList(); renderStudentsTable(); renderAbsentTable(); document.getElementById("removeName").value=""; closePanel(); renderClassButtons();
+}
+
+/* Sınıf filtreleme */
+let activeClassFilter = "";
+function renderClassButtons(){
+  const container = document.getElementById("classButtons");
+  container.innerHTML="";
+  const classes = [...new Set(students.map(s=>s.class))].sort();
+  classes.forEach(cls=>{
+    const btn = document.createElement("button");
+    btn.className="btn btn-primary";
+    btn.textContent=cls;
+    btn.addEventListener("click", ()=>{
+      activeClassFilter = (activeClassFilter===cls ? "" : cls);
+      renderStudentsTable();
+    });
+    if(activeClassFilter===cls) btn.style.backgroundColor="#1a4ec3";
+    container.appendChild(btn);
+  });
 }
 
 /* Başlat */
-updateAbsentList(); renderClassButtons(); renderStudentsTable(); renderAbsentTable();
+updateAbsentList(); renderStudentsTable(); renderAbsentTable(); renderClassButtons();
 </script>
 
 </body>
