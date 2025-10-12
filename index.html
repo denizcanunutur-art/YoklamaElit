@@ -39,7 +39,7 @@ td.name{font-weight:700}
 .status-present{background:#d6ffd9;color:#064}
 
 /* Buttons */
-.btn{display:inline-block;padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
+.btn{display:inline-block;padding:6px 10px;border-radius:6px;border:0;cursor:pointer;font-weight:700;margin:2px}
 .btn-primary{background:var(--blue);color:#fff}
 .btn-danger{background:#ff6b6b;color:#fff}
 .btn-wa{background:var(--green);color:#fff}
@@ -53,10 +53,10 @@ td.name{font-weight:700}
 .panel-inner input{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #dcdcdc}
 
 /* Sınıf filtre butonları */
-#classButtons{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0}
-#classButtons .btn{padding:4px 8px;font-size:13px;white-space:nowrap;height:28px;}
+#classFilters{margin-bottom:8px;text-align:center}
+#classFilters button{font-size:12px}
 
-/* Mobil uyum */
+/* Responsive */
 @media (max-width:900px){
   main{flex-direction:column;padding:12px}
   .table-wrap{max-height:320px}
@@ -71,16 +71,14 @@ td.name{font-weight:700}
 </header>
 
 <main>
-  <!-- Sınıf filtre -->
-  <section class="panel" style="padding:10px">
-    <h3>Sınıflar</h3>
-    <div id="classButtons"></div>
-  </section>
-
   <!-- Yoklama listesi -->
   <section class="panel" id="yoklamaPanel">
     <h3>Etüt Yoklama Listesi</h3>
     <button class="btn btn-primary btn-panel" onclick="openPanel()">Öğrenci Ekle / Çıkar</button>
+
+    <!-- Sınıf filtreleri -->
+    <div id="classFilters"></div>
+
     <div class="table-wrap">
       <table id="studentsTable">
         <thead>
@@ -181,9 +179,10 @@ const DEFAULT_STUDENTS = [
   {name:"Şükrü Kutluhan Erdoğan",class:"11Say",phone:"+9005366769239"}
 ];
 
-const STORAGE_KEY = 'elit_students_list_v4';
+const STORAGE_KEY = 'elit_students_list_v5';
 let students = loadStudents();
 let absentNames = [];
+let currentFilter = "all";
 
 function loadStudents(){
   try{
@@ -201,10 +200,29 @@ function saveStudents(){
 }
 
 /* Render */
+function renderClassFilters(){
+  const container = document.getElementById("classFilters");
+  container.innerHTML = "";
+  const classes = ["all",...new Set(students.map(s=>s.class))];
+  classes.forEach(cls=>{
+    const btn = document.createElement("button");
+    btn.textContent = cls==="all"?"Tümü":cls;
+    btn.className="btn btn-primary";
+    if(cls===currentFilter) btn.style.background="#1b4f9c";
+    btn.addEventListener("click",()=>{
+      currentFilter = cls;
+      renderClassFilters();
+      renderStudentsTable();
+    });
+    container.appendChild(btn);
+  });
+}
+
 function renderStudentsTable(){
   const tbody = document.querySelector("#studentsTable tbody");
   tbody.innerHTML = "";
   students.forEach((s)=>{
+    if(currentFilter!=="all" && s.class!==currentFilter) return;
     const tr = document.createElement("tr");
     const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
     const tdClass = document.createElement("td"); tdClass.textContent=s.class;
@@ -277,37 +295,18 @@ function addStudent(){
   if(students.some(s=>s.name.toLowerCase()===name.toLowerCase())){alert("Bu isimde bir öğrenci zaten mevcut.");return;}
   students.push({name,class:cls,phone,status:""});
   saveStudents();
-  updateAbsentList(); renderStudentsTable(); renderAbsentTable(); clearInputs(); closePanel(); renderClassButtons();
+  updateAbsentList(); renderStudentsTable(); renderAbsentTable(); renderClassFilters(); clearInputs(); closePanel();
 }
 function removeStudent(){
   const name=document.getElementById("removeName").value.trim();
   if(!name){alert("Silinecek öğrencinin adını girin.");return;}
   const idx=students.findIndex(s=>s.name.toLowerCase()===name.toLowerCase());
   if(idx===-1){alert("Bu isimde öğrenci bulunamadı.");return;}
-  students.splice(idx,1); saveStudents(); updateAbsentList(); renderStudentsTable(); renderAbsentTable(); document.getElementById("removeName").value=""; closePanel(); renderClassButtons();
-}
-
-/* Sınıf filtreleme */
-let activeClassFilter = "";
-function renderClassButtons(){
-  const container = document.getElementById("classButtons");
-  container.innerHTML="";
-  const classes = [...new Set(students.map(s=>s.class))].sort();
-  classes.forEach(cls=>{
-    const btn = document.createElement("button");
-    btn.className="btn btn-primary";
-    btn.textContent=cls;
-    btn.addEventListener("click", ()=>{
-      activeClassFilter = (activeClassFilter===cls ? "" : cls);
-      renderStudentsTable();
-    });
-    if(activeClassFilter===cls) btn.style.backgroundColor="#1a4ec3";
-    container.appendChild(btn);
-  });
+  students.splice(idx,1); saveStudents(); updateAbsentList(); renderStudentsTable(); renderAbsentTable(); renderClassFilters(); document.getElementById("removeName").value=""; closePanel();
 }
 
 /* Başlat */
-updateAbsentList(); renderStudentsTable(); renderAbsentTable(); renderClassButtons();
+updateAbsentList(); renderClassFilters(); renderStudentsTable(); renderAbsentTable();
 </script>
 
 </body>
