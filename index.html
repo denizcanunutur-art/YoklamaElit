@@ -9,7 +9,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{
   font-family: "Montserrat", Arial, sans-serif;
-  background: url('IMG_4035.jpeg') center/cover no-repeat;
+  background: url('IMG_4035.JPG') center/cover no-repeat;
   color:#222;
 }
 header{
@@ -40,18 +40,22 @@ td.name{font-weight:700}
 
 /* Buttons */
 .btn{display:inline-block;padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
-.btn-primary{background:var(--blue);color:#fff}
+.btn-primary{background:#999;color:#fff} /* gri ton */
 .btn-danger{background:#ff6b6b;color:#fff}
 .btn-wa{background:var(--green);color:#fff}
 .btn-notify{background:#4a69bd;color:#fff;margin-bottom:10px}
-/* Sadece ÖĞRENCİ EKLE / ÇIKAR butonu gri ton */
-.btn-panel{position:absolute;right:14px;top:14px; background: #7f8c8d; color:#fff;}
+.btn-panel{position:absolute;right:14px;top:14px}
 
 /* Panel (modal) */
 #overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:40}
 #panel{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;width:92%;max-width:520px}
 #panel .panel-inner{background:#fff;padding:18px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.2)}
 .panel-inner input{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #dcdcdc}
+
+/* Sınıf butonları */
+#classFilters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.class-btn{padding:6px 10px;background:#eee;border:none;border-radius:6px;cursor:pointer;font-weight:700}
+.class-btn.active{background:#2d6cdf;color:#fff}
 
 @media (max-width:900px){
   main{flex-direction:column;padding:12px}
@@ -70,7 +74,9 @@ td.name{font-weight:700}
   <!-- Yoklama listesi -->
   <section class="panel" id="yoklamaPanel">
     <h3>Etüt Yoklama Listesi</h3>
-    <button class="btn btn-panel" onclick="openPanel()">Öğrenci Ekle / Çıkar</button>
+    <button class="btn btn-primary btn-panel" onclick="openPanel()">Öğrenci Ekle / Çıkar</button>
+
+    <div id="classFilters"></div> <!-- Sınıf filtre butonları -->
 
     <div class="table-wrap">
       <table id="studentsTable">
@@ -119,6 +125,7 @@ td.name{font-weight:700}
 
 <script>
 const INSTITUTION_PHONE = "+905527112922";
+const STORAGE_KEY = 'elit_students_list_v5';
 
 const DEFAULT_STUDENTS = [
   {name:"Berrin Kıllı",class:"11Say",phone:"+9005353617536"},
@@ -172,9 +179,9 @@ const DEFAULT_STUDENTS = [
   {name:"Şükrü Kutluhan Erdoğan",class:"11Say",phone:"+9005366769239"}
 ];
 
-const STORAGE_KEY = 'elit_students_list_v6';
 let students = loadStudents();
 let absentNames = [];
+let currentClassFilter = "";
 
 function loadStudents(){
   try{
@@ -195,29 +202,31 @@ function saveStudents(){
 function renderStudentsTable(){
   const tbody = document.querySelector("#studentsTable tbody");
   tbody.innerHTML = "";
-  students.forEach((s)=>{
-    const tr = document.createElement("tr");
-    const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
-    const tdClass = document.createElement("td"); tdClass.textContent=s.class;
-    const tdStatus = document.createElement("td"); tdStatus.className="status-cell";
-    tdStatus.textContent = s.status ? (s.status==="yok"?"Yok":"Var") : "-";
-    tdStatus.classList.remove("status-empty","status-absent","status-present");
-    if(!s.status) tdStatus.classList.add("status-empty");
-    else if(s.status==="yok") tdStatus.classList.add("status-absent");
-    else tdStatus.classList.add("status-present");
+  students
+    .filter(s => !currentClassFilter || s.class === currentClassFilter)
+    .forEach((s)=>{
+      const tr = document.createElement("tr");
+      const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
+      const tdClass = document.createElement("td"); tdClass.textContent=s.class;
+      const tdStatus = document.createElement("td"); tdStatus.className="status-cell";
+      tdStatus.textContent = s.status ? (s.status==="yok"?"Yok":"Var") : "-";
+      tdStatus.classList.remove("status-empty","status-absent","status-present");
+      if(!s.status) tdStatus.classList.add("status-empty");
+      else if(s.status==="yok") tdStatus.classList.add("status-absent");
+      else tdStatus.classList.add("status-present");
 
-    tdStatus.addEventListener("click", ()=>{
-      if(!s.status) s.status="yok";
-      else if(s.status==="yok") s.status="var";
-      else s.status="";
-      updateAbsentList();
-      renderStudentsTable();
-      renderAbsentTable();
+      tdStatus.addEventListener("click", ()=>{
+        if(!s.status) s.status="yok";
+        else if(s.status==="yok") s.status="var";
+        else s.status="";
+        updateAbsentList();
+        renderStudentsTable();
+        renderAbsentTable();
+      });
+
+      tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
+      tbody.appendChild(tr);
     });
-
-    tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
-    tbody.appendChild(tr);
-  });
 }
 
 function updateAbsentList(){
@@ -269,6 +278,7 @@ function addStudent(){
   students.push({name,class:cls,phone,status:""});
   saveStudents();
   updateAbsentList(); renderStudentsTable(); renderAbsentTable(); clearInputs(); closePanel();
+  renderClassFilters();
 }
 function removeStudent(){
   const name=document.getElementById("removeName").value.trim();
@@ -276,10 +286,37 @@ function removeStudent(){
   const idx=students.findIndex(s=>s.name.toLowerCase()===name.toLowerCase());
   if(idx===-1){alert("Bu isimde öğrenci bulunamadı.");return;}
   students.splice(idx,1); saveStudents(); updateAbsentList(); renderStudentsTable(); renderAbsentTable(); document.getElementById("removeName").value=""; closePanel();
+  renderClassFilters();
+}
+
+/* Sınıf filtreleri */
+function renderClassFilters(){
+  const container = document.getElementById("classFilters");
+  container.innerHTML="";
+  const classes = [...new Set(students.map(s=>s.class))].sort();
+  const allBtn = document.createElement("button");
+  allBtn.textContent="Tüm Sınıflar"; allBtn.className="class-btn "+(!currentClassFilter?"active":"");
+  allBtn.addEventListener("click",()=>{
+    currentClassFilter="";
+    renderStudentsTable();
+    renderClassFilters();
+  });
+  container.appendChild(allBtn);
+  classes.forEach(cls=>{
+    const btn = document.createElement("button");
+    btn.textContent=cls;
+    btn.className="class-btn "+(currentClassFilter===cls?"active":"");
+    btn.addEventListener("click",()=>{
+      currentClassFilter=cls;
+      renderStudentsTable();
+      renderClassFilters();
+    });
+    container.appendChild(btn);
+  });
 }
 
 /* Başlat */
-updateAbsentList(); renderStudentsTable(); renderAbsentTable();
+updateAbsentList(); renderStudentsTable(); renderAbsentTable(); renderClassFilters();
 </script>
 
 </body>
