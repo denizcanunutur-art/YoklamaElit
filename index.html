@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Elit Eğitim Kurumu - Yoklama Sistemi</title>
 <style>
-:root{--red:#e74c3c;--blue:#2d6cdf;--green:#25d366;--muted:#f7f7f7;}
+:root{--red:#e74c3c;--blue:#2d6cdf;--green:#25d366;--muted:#f7f7f7;--gray:#bdbdbd;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{
   font-family:"Montserrat",Arial,sans-serif;
-  background:url('IMG_4035.jpeg') center/cover no-repeat;
+  background:url('IMG_4035.JPG') center/cover no-repeat;
   color:#222;
 }
 header{
@@ -44,7 +44,13 @@ td.name{font-weight:700}
 .btn-danger{background:#ff6b6b;color:#fff}
 .btn-wa{background:var(--green);color:#fff}
 .btn-notify{background:#4a69bd;color:#fff;margin-left:10px}
-.btn-panel{position:absolute;right:14px;top:14px}
+.btn-panel{
+  position:absolute;
+  right:14px;
+  top:14px;
+  background:var(--gray);
+  color:#fff;
+}
 .btn-class{background:#eee;color:#000;margin:2px;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:700}
 
 /* Panel (modal) */
@@ -71,7 +77,7 @@ td.name{font-weight:700}
 <main>
   <section class="panel" id="yoklamaPanel">
     <h3>Etüt Yoklama Listesi</h3>
-    <button class="btn btn-primary btn-panel" onclick="openPanel()">Öğrenci Ekle / Çıkar</button>
+    <button class="btn btn-panel" onclick="openPanel()">Öğrenci Ekle / Çıkar</button>
 
     <div id="classButtons"></div>
 
