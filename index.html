@@ -8,58 +8,130 @@
 :root{--red:#e74c3c;--blue:#2d6cdf;--green:#25d366;--muted:#f7f7f7;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{
-  font-family: "Montserrat", Arial, sans-serif;
-  background: url('IMG_4035.jpeg') center/cover no-repeat;
+  font-family:"Montserrat", Arial, sans-serif;
+  background:url('IMG_4035.JPG') center/cover no-repeat;
   color:#222;
 }
 header{
-  background: rgba(255,255,255,0.92);
+  background:rgba(255,255,255,0.95);
   padding:20px 12px;
   text-align:center;
-  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  box-shadow:0 2px 12px rgba(0,0,0,0.06);
 }
 header h1{margin:0;font-size:28px;font-weight:800}
 header h1 span{color:var(--red)}
-header h2{margin:6px 0 0 0;font-size:15px;color:#555;font-weight:600}
+header h2{margin:6px 0 0 0;font-size:16px;color:#555;font-weight:600}
 
-main{display:flex;gap:18px;padding:18px;flex-wrap:wrap;justify-content:center}
-.panel{background:rgba(255,255,255,0.96);border-radius:10px;padding:14px;box-shadow:0 6px 20px rgba(0,0,0,0.05);flex:1 1 420px;min-width:300px;position:relative}
-h3{margin:0 0 10px 0;font-size:18px}
+main{
+  display:flex;
+  gap:18px;
+  padding:18px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
 
-.table-wrap{max-height:440px;overflow-y:auto;overflow-x:hidden;border-radius:6px;border:1px solid #e6e6e6;background:#fff}
-table{width:100%;border-collapse:collapse;min-width:300px}
-thead th{position:sticky;top:0;background:var(--muted);border-bottom:1px solid #e6e6e6;padding:10px;font-weight:700;text-align:left}
-tbody td{padding:10px;border-bottom:1px solid #f0f0f0;text-align:left}
+.panel{
+  background:rgba(255,255,255,0.97);
+  border-radius:10px;
+  padding:14px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.05);
+  flex:1 1 420px;
+  min-width:300px;
+  position:relative;
+}
+
+h3{margin:0 0 10px 0;font-size:18px;font-weight:700}
+
+.table-wrap{
+  max-height:400px;
+  overflow-y:auto;
+  border-radius:6px;
+  border:1px solid #e6e6e6;
+  background:#fff;
+  margin-top:8px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:300px;
+}
+thead th{
+  position:sticky;
+  top:0;
+  background:var(--muted);
+  border-bottom:1px solid #e6e6e6;
+  padding:10px;
+  font-weight:700;
+  text-align:left;
+}
+tbody td{
+  padding:10px;
+  border-bottom:1px solid #f0f0f0;
+  text-align:left;
+}
 tbody tr:hover{background:rgba(0,0,0,0.03)}
 td.name{font-weight:700}
 
-.status-cell{width:110px;text-align:center;cursor:pointer;border-radius:6px;padding:6px;font-weight:700}
+.status-cell{
+  width:110px;
+  text-align:center;
+  cursor:pointer;
+  border-radius:6px;
+  padding:6px;
+  font-weight:700;
+  transition:0.2s;
+}
 .status-empty{background:transparent;color:#333}
 .status-absent{background:#ffd8d8;color:#800}
 .status-present{background:#d6ffd9;color:#064}
 
-/* Buttons */
-.btn{display:inline-block;padding:6px 10px;border-radius:6px;border:0;cursor:pointer;font-weight:700;margin:2px}
+.btn{
+  display:inline-block;
+  padding:8px 12px;
+  border-radius:8px;
+  border:0;
+  cursor:pointer;
+  font-weight:700;
+  transition:0.2s;
+}
+.btn:hover{opacity:0.85;}
 .btn-primary{background:var(--blue);color:#fff}
 .btn-danger{background:#ff6b6b;color:#fff}
 .btn-wa{background:var(--green);color:#fff}
 .btn-notify{background:#4a69bd;color:#fff;margin-bottom:10px}
 .btn-panel{position:absolute;right:14px;top:14px}
 
-/* Panel (modal) */
+/* Sınıf butonları */
+#classFilters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:6px;
+}
+.class-btn{
+  padding:5px 10px;
+  border-radius:6px;
+  background:#f0f0f0;
+  border:1px solid #ccc;
+  cursor:pointer;
+  font-weight:700;
+  font-size:14px;
+  transition:0.2s;
+}
+.class-btn:hover{background:#e0e0e0;}
+.class-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+
+/* Panel modal */
 #overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:40}
 #panel{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;width:92%;max-width:520px}
 #panel .panel-inner{background:#fff;padding:18px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.2)}
 .panel-inner input{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #dcdcdc}
 
-/* Sınıf filtre butonları */
-#classFilters{margin-bottom:8px;text-align:center}
-#classFilters button{font-size:12px}
-
-/* Responsive */
-@media (max-width:900px){
+@media(max-width:900px){
   main{flex-direction:column;padding:12px}
-  .table-wrap{max-height:320px}
+  .table-wrap{max-height:300px}
+  #classFilters{justify-content:center}
 }
 </style>
 </head>
@@ -76,7 +148,6 @@ td.name{font-weight:700}
     <h3>Etüt Yoklama Listesi</h3>
     <button class="btn btn-primary btn-panel" onclick="openPanel()">Öğrenci Ekle / Çıkar</button>
 
-    <!-- Sınıf filtreleri -->
     <div id="classFilters"></div>
 
     <div class="table-wrap">
@@ -125,9 +196,10 @@ td.name{font-weight:700}
 </div>
 
 <script>
-const INSTITUTION_PHONE = "+905527112922";
+const INSTITUTION_PHONE="+905527112922";
+const STORAGE_KEY='elit_students_list_v5';
 
-const DEFAULT_STUDENTS = [
+const DEFAULT_STUDENTS=[
   {name:"Berrin Kıllı",class:"11Say",phone:"+9005353617536"},
   {name:"Cemal Tarık Arslanoğlu",class:"11Say",phone:"+9005052575443"},
   {name:"Emin Dede",class:"11Say",phone:"+9005343968830"},
@@ -179,39 +251,39 @@ const DEFAULT_STUDENTS = [
   {name:"Şükrü Kutluhan Erdoğan",class:"11Say",phone:"+9005366769239"}
 ];
 
-const STORAGE_KEY = 'elit_students_list_v5';
-let students = loadStudents();
-let absentNames = [];
-let currentFilter = "all";
+let students=loadStudents();
+let absentNames=[];
+let activeClass="";
 
 function loadStudents(){
   try{
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw=localStorage.getItem(STORAGE_KEY);
     if(raw){
-      const parsed = JSON.parse(raw);
-      return parsed.map(s => ({name:s.name,class:s.class,phone:s.phone,status:""}));
+      const parsed=JSON.parse(raw);
+      return parsed.map(s=>({name:s.name,class:s.class,phone:s.phone,status:""}));
     }
   }catch(e){}
-  return DEFAULT_STUDENTS.map(s => ({name:s.name,class:s.class,phone:s.phone,status:""}));
+  return DEFAULT_STUDENTS.map(s=>({name:s.name,class:s.class,phone:s.phone,status:""}));
 }
+
 function saveStudents(){
-  const toSave = students.map(({name,class:cls,phone}) => ({name, class:cls, phone}));
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+  const toSave=students.map(({name,class:cls,phone})=>({name,class:cls,phone}));
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(toSave));
 }
 
 /* Render */
-function renderClassFilters(){
-  const container = document.getElementById("classFilters");
-  container.innerHTML = "";
-  const classes = ["all",...new Set(students.map(s=>s.class))];
+function renderClassButtons(){
+  const container=document.getElementById("classFilters");
+  container.innerHTML="";
+  const classes=[...new Set(students.map(s=>s.class))].sort();
   classes.forEach(cls=>{
-    const btn = document.createElement("button");
-    btn.textContent = cls==="all"?"Tümü":cls;
-    btn.className="btn btn-primary";
-    if(cls===currentFilter) btn.style.background="#1b4f9c";
+    const btn=document.createElement("button");
+    btn.className="class-btn"+(activeClass===cls?" active":"");
+    btn.textContent=cls;
     btn.addEventListener("click",()=>{
-      currentFilter = cls;
-      renderClassFilters();
+      if(activeClass===cls) activeClass="";
+      else activeClass=cls;
+      renderClassButtons();
       renderStudentsTable();
     });
     container.appendChild(btn);
@@ -219,21 +291,20 @@ function renderClassFilters(){
 }
 
 function renderStudentsTable(){
-  const tbody = document.querySelector("#studentsTable tbody");
-  tbody.innerHTML = "";
-  students.forEach((s)=>{
-    if(currentFilter!=="all" && s.class!==currentFilter) return;
-    const tr = document.createElement("tr");
-    const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
-    const tdClass = document.createElement("td"); tdClass.textContent=s.class;
-    const tdStatus = document.createElement("td"); tdStatus.className="status-cell";
-    tdStatus.textContent = s.status ? (s.status==="yok"?"Yok":"Var") : "-";
+  const tbody=document.querySelector("#studentsTable tbody");
+  tbody.innerHTML="";
+  students.forEach(s=>{
+    if(activeClass && s.class!==activeClass) return;
+    const tr=document.createElement("tr");
+    const tdName=document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
+    const tdClass=document.createElement("td"); tdClass.textContent=s.class;
+    const tdStatus=document.createElement("td"); tdStatus.className="status-cell";
+    tdStatus.textContent=s.status? (s.status==="yok"?"Yok":"Var"):"-";
     tdStatus.classList.remove("status-empty","status-absent","status-present");
     if(!s.status) tdStatus.classList.add("status-empty");
     else if(s.status==="yok") tdStatus.classList.add("status-absent");
     else tdStatus.classList.add("status-present");
-
-    tdStatus.addEventListener("click", ()=>{
+    tdStatus.addEventListener("click",()=>{
       if(!s.status) s.status="yok";
       else if(s.status==="yok") s.status="var";
       else s.status="";
@@ -241,21 +312,20 @@ function renderStudentsTable(){
       renderStudentsTable();
       renderAbsentTable();
     });
-
     tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
     tbody.appendChild(tr);
   });
 }
 
 function updateAbsentList(){
-  absentNames = students.filter(s=>s.status==="yok").map(s=>s.name);
+  absentNames=students.filter(s=>s.status==="yok").map(s=>s.name);
 }
 
 function renderAbsentTable(){
-  const tbody = document.querySelector("#absentTable tbody");
-  tbody.innerHTML = "";
+  const tbody=document.querySelector("#absentTable tbody");
+  tbody.innerHTML="";
   absentNames.forEach(name=>{
-    const st = students.find(s=>s.name===name); if(!st) return;
+    const st=students.find(s=>s.name===name); if(!st) return;
     const tr=document.createElement("tr");
     const tdName=document.createElement("td"); tdName.className="name"; tdName.textContent=st.name;
     const tdClass=document.createElement("td"); tdClass.textContent=st.class;
@@ -276,8 +346,8 @@ function sendIndividualWA(phone,name){
 }
 function notifyInstitution(){
   if(absentNames.length===0){alert("Tüm öğrenciler etütte, bildirilecek öğrenci yok.");return;}
-  const namesJoined = absentNames.join(", ");
-  const message = `Etütte olmayan öğrenciler:\n\n${namesJoined}`;
+  const namesJoined=absentNames.join(", ");
+  const message=`Etütte olmayan öğrenciler:\n\n${namesJoined}`;
   const url=`https://wa.me/${INSTITUTION_PHONE.replace(/\+/g,'')}?text=${encodeURIComponent(message)}`;
   window.open(url,"_blank");
 }
@@ -294,19 +364,18 @@ function addStudent(){
   if(!name||!cls||!phone){alert("Lütfen tüm alanları doldurun (isim, sınıf, telefon).");return;}
   if(students.some(s=>s.name.toLowerCase()===name.toLowerCase())){alert("Bu isimde bir öğrenci zaten mevcut.");return;}
   students.push({name,class:cls,phone,status:""});
-  saveStudents();
-  updateAbsentList(); renderStudentsTable(); renderAbsentTable(); renderClassFilters(); clearInputs(); closePanel();
+  saveStudents(); updateAbsentList(); renderClassButtons(); renderStudentsTable(); renderAbsentTable(); clearInputs(); closePanel();
 }
 function removeStudent(){
   const name=document.getElementById("removeName").value.trim();
   if(!name){alert("Silinecek öğrencinin adını girin.");return;}
   const idx=students.findIndex(s=>s.name.toLowerCase()===name.toLowerCase());
   if(idx===-1){alert("Bu isimde öğrenci bulunamadı.");return;}
-  students.splice(idx,1); saveStudents(); updateAbsentList(); renderStudentsTable(); renderAbsentTable(); renderClassFilters(); document.getElementById("removeName").value=""; closePanel();
+  students.splice(idx,1); saveStudents(); updateAbsentList(); renderClassButtons(); renderStudentsTable(); renderAbsentTable(); document.getElementById("removeName").value=""; closePanel();
 }
 
 /* Başlat */
-updateAbsentList(); renderClassFilters(); renderStudentsTable(); renderAbsentTable();
+updateAbsentList(); renderClassButtons(); renderStudentsTable(); renderAbsentTable();
 </script>
 
 </body>
