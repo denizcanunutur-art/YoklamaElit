@@ -1,739 +1,182 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Elit Eğitim Kurumu - Yoklama Sistemi</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elit Eğitim Kurumu Yoklama Sistemi</title>
 <style>
-:root{--red:#e74c3c;--blue:#2d6cdf;--green:#25d366;--muted:#f7f7f7;--gray:#bdbdbd;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{
-  font-family:"Montserrat",Arial,sans-serif;
-  background:url('IMG_4035.JPG') center/cover no-repeat;
-  color:#222;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-}
-header{
-  background:rgba(255,255,255,0.92);
-  padding:20px 12px;
-  text-align:center;
-  box-shadow:0 2px 8px rgba(0,0,0,0.06);
-}
-header h1{margin:0;font-size:28px;font-weight:800}
-header h1 span{color:var(--red)}
-header h2{margin:6px 0 0 0;font-size:15px;color:#555;font-weight:600}
-
-.container{padding:18px;flex:1;display:flex;gap:18px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
-.panel{background:rgba(255,255,255,0.96);border-radius:10px;padding:14px;box-shadow:0 6px 20px rgba(0,0,0,0.05);flex:1 1 420px;min-width:300px;position:relative}
-h3{margin:0 0 10px 0;font-size:18px}
-
-.table-wrap{max-height:440px;overflow-y:auto;overflow-x:hidden;border-radius:6px;border:1px solid #e6e6e6;background:#fff}
-table{width:100%;border-collapse:collapse;min-width:300px}
-thead th{position:sticky;top:0;background:var(--muted);border-bottom:1px solid #e6e6e6;padding:10px;font-weight:700;text-align:left}
-tbody td{padding:10px;border-bottom:1px solid #f0f0f0;text-align:left}
-tbody tr:hover{background:rgba(0,0,0,0.03)}
-td.name{font-weight:700}
-
-.status-cell{width:140px;text-align:center;cursor:pointer;border-radius:6px;padding:6px;font-weight:700}
-.status-empty{background:transparent;color:#333}
-.status-absent{background:#ffd8d8;color:#800}
-.status-derste{background:#d6ffd9;color:#064}
-.status-etutte{background:#d6ffd9;color:#064}
-
-/* Buttons */
-.btn{display:inline-block;padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
-.btn-primary{background:var(--blue);color:#fff}
-.btn-danger{background:#ff6b6b;color:#fff}
-.btn-wa{background:var(--green);color:#fff}
-.btn-notify{background:#4a69bd;color:#fff;margin-left:10px}
-.btn-panel{
-  position:absolute;
-  right:14px;
-  top:14px;
-  background:var(--gray);
-  color:#fff;
-}
-.btn-class{background:#eee;color:var(--blue);margin:2px;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:700}
-
-/* Panel (modal) */
-#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:40}
-#panel{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;width:92%;max-width:520px}
-#panel .panel-inner{background:#fff;padding:18px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.2)}
-.panel-inner input{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #dcdcdc}
-
-#classButtons{display:flex;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
-
-.controls {display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;justify-content:center;align-items:center}
-.controls select, .controls input[type="text"]{padding:6px;border-radius:6px;border:1px solid #dcdcdc}
-small.hint{display:block;margin-top:6px;color:#666}
-
-/* Login modal */
-#loginModal{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:60;width:95%;max-width:520px}
-#loginModal .inner{background:#fff;padding:20px;border-radius:12px;box-shadow:0 18px 40px rgba(0,0,0,0.25)}
-.login-row{display:flex;gap:12px;justify-content:center;margin:12px 0}
-.login-btn{padding:12px 18px;border-radius:10px;border:0;font-weight:800;cursor:pointer}
-.login-btn.teacher{background:var(--blue);color:#fff}
-.login-btn.parent{background:var(--green);color:#fff}
-.login-form{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-
-/* History modal */
-#historyModal{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:70;width:96%;max-width:900px;max-height:85vh;overflow:auto}
-#historyModal .inner{background:#fff;padding:18px;border-radius:12px;box-shadow:0 18px 40px rgba(0,0,0,0.25)}
-
-/* small responsive tweaks */
-@media (max-width:900px){
-  .container{flex-direction:column;padding:12px}
-  .table-wrap{max-height:320px}
-}
+  :root {
+    --green: #2ecc71;
+    --red: #e74c3c;
+    --blue: #2d6cdf;
+    --light: #f7f9fb;
+  }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: url('background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    color: #333;
+  }
+  .container {
+    max-width: 500px;
+    margin: 80px auto;
+    background: rgba(255,255,255,0.9);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    text-align: center;
+  }
+  h1 { color: var(--blue); margin-bottom: 20px; }
+  button {
+    padding: 12px 20px;
+    font-size: 17px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 10px;
+  }
+  .teacher-btn { background: var(--blue); color: #fff; }
+  .parent-btn { background: var(--green); color: #fff; }
+  .hidden { display: none; }
+  select, input {
+    padding: 10px;
+    margin: 10px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  .student-list { text-align: left; margin-top: 20px; }
+  .student-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 8px;
+    background: #f9f9f9;
+    border-radius: 6px;
+  }
+  .save-btn { background: var(--green); color: white; width: 100%; margin-top: 15px; }
+  .status-derste { color: var(--green); font-weight: 600; }
+  .status-etutte { color: var(--green); font-weight: 600; }
+  .status-yok { color: var(--red); font-weight: 600; }
+  .logout { background: var(--red); color: white; width: 100%; margin-top: 20px; }
 </style>
 </head>
 <body>
 
-<header>
-  <h1><span>Elit</span> Eğitim Kurumu</h1>
-  <h2 id="headerSubtitle">Yoklama Alma Sistemi</h2>
-</header>
-
-<div class="container">
-  <!-- LEFT: Yoklama / Yönetim Paneli -->
-  <section class="panel" id="yoklamaPanel">
-    <h3>Etüt / Ders Yoklama</h3>
-    <div id="topControls"></div>
-    <div id="classButtons"></div>
-    <div class="table-wrap" style="margin-top:8px">
-      <table id="studentsTable">
-        <thead>
-          <tr><th>İsim</th><th>Sınıf</th><th>Durum (tıklayarak değiştir)</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <button id="btnSaveAttendance" class="btn btn-primary">Yoklamayı Kaydet</button>
-      <button id="btnViewHistory" class="btn">Geçmişi Görüntüle</button>
-      <button id="btnPanel" class="btn btn-panel">Öğrenci Ekle / Çıkar</button>
-    </div>
-    <small class="hint">Durum sırası: (boş) → Derste → Etütte → Kurumda Yok → (boş). Öğretmen girişi ile düzenleme yapılır.</small>
-  </section>
-
-  <!-- RIGHT: Veli / Yoklamada Olmayanlar -->
-  <section class="panel" id="parentPanel">
-    <h3>Veli Görünümü</h3>
-    <div id="parentControls" style="margin-bottom:8px"></div>
-    <div class="table-wrap">
-      <table id="parentViewTable">
-        <thead><tr><th>İsim</th><th>Sınıf</th><th>Durum</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    <small class="hint" id="parentHint">Veli olarak giriş yapıp öğrencinizi seçin veya tüm listeyi görüntüleyin.</small>
-  </section>
+<div class="container" id="login-screen">
+  <h1>Elit Eğitim Kurumu</h1>
+  <p>Yoklama Sistemine Giriş Yapın</p>
+  <button class="teacher-btn" onclick="login('teacher')">👩‍🏫 Öğretmen Girişi</button>
+  <button class="parent-btn" onclick="login('parent')">👨‍👩‍👧‍👦 Veli Girişi</button>
 </div>
 
-<!-- overlays & modals -->
-<div id="overlay"></div>
+<!-- Öğretmen Paneli -->
+<div class="container hidden" id="teacher-panel">
+  <h2>Öğretmen Paneli</h2>
+  <label>Tür Seç:</label>
+  <select id="activity-type">
+    <option value="ders">Ders</option>
+    <option value="etüt">Etüt</option>
+  </select>
 
-<!-- Student management panel (existing) -->
-<div id="panel" role="dialog" aria-modal="true" aria-hidden="true">
-  <div class="panel-inner">
-    <h3>Öğrenci Yönetimi</h3>
-    <input id="newName" type="text" placeholder="Ad Soyad" />
-    <input id="newClass" type="text" placeholder="Sınıf (örn: 11Say)" />
-    <input id="newPhone" type="text" placeholder="Telefon (örn +90...)" />
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button class="btn btn-primary" id="btnAdd">Ekle</button>
-      <button class="btn" id="btnClear">Temizle</button>
-    </div>
-    <hr style="margin:12px 0">
-    <div style="font-weight:700;margin-bottom:6px">Öğrenci Sil</div>
-    <input id="removeName" type="text" placeholder="Silinecek öğrenci adı" />
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button class="btn btn-danger" id="btnRemove">Sil</button>
-      <button class="btn" id="btnClose">Kapat</button>
-    </div>
-  </div>
+  <div class="student-list" id="teacher-students"></div>
+  <button class="save-btn" onclick="saveAttendance()">Yoklamayı Kaydet</button>
+  <button class="logout" onclick="logout()">Çıkış</button>
 </div>
 
-<!-- Login modal -->
-<div id="loginModal">
-  <div class="inner">
-    <h3>Giriş Yap</h3>
-    <div style="text-align:center;margin-bottom:8px">Giriş türünü seçin:</div>
-    <div class="login-row">
-      <button class="login-btn teacher" id="loginTeacherBtn">👩‍🏫 Öğretmen Girişi</button>
-      <button class="login-btn parent" id="loginParentBtn">👨‍👩‍👧‍👦 Veli Girişi</button>
-    </div>
-    <div id="loginFormArea" class="login-form" style="display:none">
-      <!-- dynamic -->
-    </div>
-    <div style="text-align:center;margin-top:10px">
-      <button class="btn" id="closeLogin">Kapat</button>
-    </div>
-  </div>
+<!-- Veli Paneli -->
+<div class="container hidden" id="parent-panel">
+  <h2>Veli Paneli</h2>
+  <p>Öğrencilerin Güncel Durumu:</p>
+  <div class="student-list" id="parent-students"></div>
+  <button class="logout" onclick="logout()">Çıkış</button>
 </div>
 
-<!-- History modal -->
-<div id="historyModal">
-  <div class="inner">
-    <h3>Yoklama Geçmişi</h3>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;align-items:center">
-      <label>Tür:</label>
-      <select id="historyTypeFilter">
-        <option value="">Tümü</option>
-        <option value="etut">Etüt</option>
-        <option value="ders">Ders</option>
-      </select>
-      <label> Sınıf:</label>
-      <select id="historyClassFilter"><option value="">Tümü</option></select>
-      <label> Öğretmen:</label>
-      <input id="historyTeacherFilter" placeholder="Öğretmen adı" />
-      <button id="historyRefresh" class="btn">Yenile</button>
-      <button id="exportCSV" class="btn btn-primary">CSV İndir</button>
-    </div>
-    <div id="historyList" style="max-height:60vh;overflow:auto;margin-top:8px"></div>
-    <div style="text-align:right;margin-top:10px">
-      <button class="btn" id="closeHistory">Kapat</button>
-    </div>
-  </div>
-</div>
+<script>
+const students = [
+  "İrem Korkmaz",
+  "Fatma Özdemir",
+  "Semih Kodaz",
+  "Anıl Boşnak",
+  "Emin Dede"
+];
 
-<script type="module">
-// -------------------- Firebase imports --------------------
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import {
-  getFirestore, collection, getDocs, setDoc, doc, deleteDoc, addDoc,
-  query, orderBy, serverTimestamp, where, limit, getDoc
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-
-// -------------------- Firebase config (senden gelen) --------------------
-const firebaseConfig = {
-  apiKey: "AIzaSyBka7ReTV8sGjR9GAsJUDkksLSCTHCV9Mk",
-  authDomain: "elit-yoklama.firebaseapp.com",
-  projectId: "elit-yoklama",
-  storageBucket: "elit-yoklama.firebasestorage.app",
-  messagingSenderId: "30260081027",
-  appId: "1:30260081027:web:9332093cbc19d605d506b6"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// -------------------- Global state --------------------
-const INSTITUTION_PHONE = "+905527112922";
-let activeClassFilter = null;
-let students = []; // {name,class,phone}
-let statuses = {}; // { "Ad Soyad": "ders"|"etut"|"absent"|undefined }
-let loggedIn = { role: null, name: null }; // role: "teacher"|"parent"|null
-
-// -------------------- Utility DOM refs --------------------
-const overlay = document.getElementById('overlay');
-const panel = document.getElementById('panel');
-const loginModal = document.getElementById('loginModal');
-const historyModal = document.getElementById('historyModal');
-
-// -------------------- Initial UI injection --------------------
-document.addEventListener('DOMContentLoaded', ()=>{
-  // top controls (attendance type + class quick filter + teacher name input)
-  const topControls = document.getElementById('topControls');
-  topControls.innerHTML = `
-    <div class="controls">
-      <label>Yoklama Türü:</label>
-      <select id="attendanceType">
-        <option value="etut">Etüt</option>
-        <option value="ders">Ders</option>
-      </select>
-      <label>Öğretmen:</label>
-      <input type="text" id="teacherNameInput" placeholder="Öğretmen adı" />
-      <label>Sınıf Filtre:</label>
-      <select id="selectClassFilter"><option value="">Tümü</option></select>
-    </div>
-  `;
-
-  // parent controls (child select or all)
-  const parentControls = document.getElementById('parentControls');
-  parentControls.innerHTML = `
-    <div class="controls">
-      <label>Veli için öğrenci ara/ad:</label>
-      <input id="parentSearch" placeholder="Öğrenci adı ile filtrele" />
-      <button id="btnRefreshParent" class="btn">Güncelle</button>
-    </div>
-  `;
-
-  // attach login open on load
-  openLoginModal();
-
-  // event listeners for global buttons
-  document.getElementById('btnPanel').addEventListener('click', openPanel);
-  document.getElementById('overlay').addEventListener('click', closePanelAndModals);
-  document.getElementById('btnAdd').addEventListener('click', addStudent);
-  document.getElementById('btnRemove').addEventListener('click', removeStudent);
-  document.getElementById('btnClear').addEventListener('click', clearInputs);
-  document.getElementById('btnSaveAttendance').addEventListener('click', saveAttendance);
-  document.getElementById('btnViewHistory').addEventListener('click', openHistoryModal);
-  document.getElementById('btnViewHistory').addEventListener('click', loadHistoryList);
-  document.getElementById('btnRefreshParent').addEventListener('click', renderParentView);
-  document.getElementById('closeLogin').addEventListener('click', closeLoginModal);
-  document.getElementById('closeHistory').addEventListener('click', closeHistoryModal);
-  document.getElementById('historyRefresh').addEventListener('click', loadHistoryList);
-  document.getElementById('exportCSV').addEventListener('click', exportHistoryCSV);
-
-  // login buttons
-  document.getElementById('loginTeacherBtn').addEventListener('click', ()=> showLoginForm('teacher'));
-  document.getElementById('loginParentBtn').addEventListener('click', ()=> showLoginForm('parent'));
-
-  // history class filter populate after students load
-  loadStudents();
-});
-
-// -------------------- Load students from Firestore --------------------
-async function loadStudents(){
-  students = [];
-  try {
-    const q = collection(db,'students');
-    const snapshot = await getDocs(q);
-    snapshot.forEach(d => students.push({...d.data()}));
-  } catch(e){
-    console.error("students load error:", e);
-    alert("Öğrenci verileri yüklenirken hata oluştu. (Tarayıcıdan deneme yapabilirsiniz.)");
-  }
-  renderClassButtons();
-  populateClassSelect();
-  renderStudentsTable();
-  populateHistoryClassFilter();
-  renderParentView();
-}
-
-// Render class buttons and select
-function renderClassButtons(){
-  const container = document.getElementById("classButtons");
-  container.innerHTML = "";
-  const classes = [...new Set(students.map(s=>s.class))].sort();
-  classes.forEach(cls=>{
-    const btn = document.createElement("button");
-    btn.textContent = cls;
-    btn.className = "btn-class";
-    btn.style.color = "var(--blue)";
-    if(activeClassFilter===cls){
-      btn.style.backgroundColor = "var(--blue)";
-      btn.style.color = "#fff";
-    }
-    btn.addEventListener("click", ()=>{
-      activeClassFilter = (activeClassFilter===cls)?null:cls;
-      document.getElementById("selectClassFilter").value = activeClassFilter || "";
-      renderStudentsTable();
-      renderClassButtons();
-    });
-    container.appendChild(btn);
-  });
-}
-
-function populateClassSelect(){
-  const sel = document.getElementById("selectClassFilter");
-  sel.innerHTML = `<option value="">Tümü</option>`;
-  const classes = [...new Set(students.map(s=>s.class))].sort();
-  classes.forEach(cls=>{
-    const opt = document.createElement("option"); opt.value = cls; opt.textContent = cls;
-    sel.appendChild(opt);
-  });
-  sel.value = activeClassFilter || "";
-  sel.addEventListener("change", ()=>{
-    activeClassFilter = sel.value || null;
-    renderStudentsTable();
-    renderClassButtons();
-  });
-}
-
-// -------------------- Students table render (teacher view editable) --------------------
-function renderStudentsTable(){
-  const tbody = document.querySelector("#studentsTable tbody");
-  tbody.innerHTML = "";
-  students.filter(s=>!activeClassFilter || s.class===activeClassFilter)
-  .forEach(s=>{
-    const tr = document.createElement("tr");
-    const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
-    const tdClass = document.createElement("td"); tdClass.textContent=s.class;
-    const tdStatus = document.createElement("td"); tdStatus.className="status-cell";
-    const st = statuses[s.name] || "";
-    tdStatus.classList.remove("status-empty","status-absent","status-derste","status-etutte");
-    if(!st) tdStatus.classList.add("status-empty");
-    else if(st==="absent") tdStatus.classList.add("status-absent");
-    else if(st==="ders") tdStatus.classList.add("status-derste");
-    else if(st==="etut") tdStatus.classList.add("status-etutte");
-    tdStatus.textContent = st ? (st==="absent"?"Kurumda Yok": (st==="ders"?"Derste":"Etütte")) : "-";
-    // only teacher can toggle statuses
-    tdStatus.addEventListener("click", ()=>{
-      if(loggedIn.role!=="teacher"){ return; }
-      cycleStatus(s.name);
-    });
-    tr.appendChild(tdName);
-    tr.appendChild(tdClass);
-    tr.appendChild(tdStatus);
-    tbody.appendChild(tr);
-  });
-}
-
-// cycle status: undefined -> ders -> etut -> absent -> undefined
-function cycleStatus(name){
-  const cur = statuses[name];
-  if(!cur) statuses[name] = "ders";
-  else if(cur==="ders") statuses[name] = "etut";
-  else if(cur==="etut") statuses[name] = "absent";
-  else delete statuses[name];
-  renderStudentsTable();
-  renderParentView(); // reflect change for parent view realtime
-}
-
-// -------------------- Absent table (for previous UI) --------------------
-function renderAbsentTable(){ /* not used now; kept for compatibility */ }
-
-// -------------------- WhatsApp / notify institution (unchanged) --------------------
-function sendIndividualWA(phone,name){
-  const msg = `Merhabalar Öğrencimiz ${name} etüte katılmamıştır, bilginize sunarız.%0AElit Eğitim Kurumu`;
-  const url = `https://wa.me/${phone.replace(/\+/g,'')}?text=${msg}`;
-  window.open(url,"_blank");
-}
-
-function notifyInstitution(){
-  const absents = students.filter(s=>statuses[s.name]==="absent").map(s=>s.name);
-  if(absents.length===0){ alert("Tüm öğrenciler etütte/derste, bildirilecek öğrenci yok."); return; }
-  const message = `Etütte/derste olmayan öğrenciler:\n\n${absents.join(", ")}`;
-  const url = `https://wa.me/${INSTITUTION_PHONE.replace(/\+/g,'')}?text=${encodeURIComponent(message)}`;
-  window.open(url,"_blank");
-}
-
-// -------------------- Panel controls --------------------
-function openPanel(){ 
-  if(loggedIn.role!=="teacher"){ alert("Öğretmen girişi gereklidir."); return; }
-  document.getElementById("overlay").style.display="block"; 
-  panel.style.display="block"; 
-}
-function closePanel(){ document.getElementById("overlay").style.display="none"; panel.style.display="none"; }
-function closePanelAndModals(){ 
-  document.getElementById("overlay").style.display="none"; 
-  panel.style.display="none"; 
-  loginModal.style.display="none";
-  historyModal.style.display="none";
-}
-function clearInputs(){ document.getElementById("newName").value=""; document.getElementById("newClass").value=""; document.getElementById("newPhone").value=""; }
-
-// -------------------- Add / Remove students (Firestore) --------------------
-async function addStudent(){
-  const name = document.getElementById("newName").value.trim();
-  const cls = document.getElementById("newClass").value.trim();
-  const phone = document.getElementById("newPhone").value.trim();
-  if(!name || !cls){ alert("Lütfen isim ve sınıf girin."); return; }
-  const exists = students.some(s=>s.name.toLowerCase()===name.toLowerCase());
-  if(exists){ alert("Bu isimde öğrenci zaten mevcut."); return; }
-  const newStudent = {name, class:cls, phone};
-  try {
-    await setDoc(doc(db,"students",name), newStudent);
-    students.push(newStudent);
-    renderClassButtons(); renderStudentsTable(); clearInputs(); closePanel();
-    populateClassSelect(); populateHistoryClassFilter();
-    alert("Öğrenci eklendi.");
-  } catch(e){
-    console.error("addStudent error", e);
-    alert("Öğrenci eklenirken hata oldu.");
-  }
-}
-
-async function removeStudent(){
-  const name = document.getElementById("removeName").value.trim();
-  if(!name){ alert("Silinecek öğrencinin adını girin."); return; }
-  const idx = students.findIndex(s=>s.name.toLowerCase()===name.toLowerCase());
-  if(idx===-1){ alert("Bu isimde öğrenci bulunamadı."); return; }
-  try {
-    await deleteDoc(doc(db,"students",students[idx].name));
-    students.splice(idx,1);
-    renderClassButtons(); renderStudentsTable();
-    document.getElementById("removeName").value="";
-    closePanel();
-    populateClassSelect(); populateHistoryClassFilter();
-    alert("Öğrenci silindi.");
-  } catch(e){
-    console.error("removeStudent error", e);
-    alert("Öğrenci silinirken hata oldu.");
-  }
-}
-
-// -------------------- Save attendance (teacher) --------------------
-async function saveAttendance(){
-  if(loggedIn.role!=="teacher"){ alert("Öğretmen girişi gereklidir."); return; }
-  // prepare records only for currently filtered students (or all)
-  const classFilter = activeClassFilter || "";
-  const records = {};
-  students.filter(s=>!classFilter || s.class===classFilter).forEach(s=>{
-    records[s.name] = statuses[s.name] || "none";
-  });
-  const type = document.getElementById('attendanceType').value || 'etut';
-  const teacher = document.getElementById('teacherNameInput').value.trim() || loggedIn.name || "Bilinmeyen";
-
-  if(Object.keys(records).length===0){ if(!confirm("Bu sınıf/filtrede öğrenci yok. Yine de kaydetmek istiyor musunuz?")==false) return; }
-
-  const payload = {
-    type,
-    teacher,
-    classFilter,
-    records,
-    createdAt: serverTimestamp()
-  };
-
-  try {
-    await addDoc(collection(db,'attendanceLogs'), payload);
-    alert(`${type === "etut" ? "Etüt" : "Ders"} yoklaması başarıyla kaydedildi.`);
-    // Optionally clear statuses after save (commented out). If you want to clear: statuses = {}; renderStudentsTable();
-  } catch(e){
-    console.error("saveAttendance error", e);
-    alert("Yoklama kaydedilirken hata oluştu.");
-  }
-}
-
-// -------------------- Parent view: show last saved attendance --------------------
-async function renderParentView(){
-  const tbody = document.querySelector("#parentViewTable tbody");
-  tbody.innerHTML = "";
-  // Optional parentSearch filter (local)
-  const search = (document.getElementById('parentSearch')?.value || "").trim().toLowerCase();
-
-  // Get latest attendance log (most recent)
-  try {
-    const q = query(collection(db,'attendanceLogs'), orderBy('createdAt','desc'), limit(1));
-    const snap = await getDocs(q);
-    if(snap.empty){
-      // no records: show all students as "Kurumda Yok"
-      students.filter(s=>!search || s.name.toLowerCase().includes(search)).forEach(s=>{
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td class="name">${s.name}</td><td>${s.class}</td><td style="color:${'#c0392b'};font-weight:700">Kurumda Yok</td>`;
-        tbody.appendChild(tr);
-      });
-      return;
-    }
-    // use the most recent document
-    const d = snap.docs[0].data();
-    const records = d.records || {};
-    // show students (filtered by search)
-    students.filter(s=>!search || s.name.toLowerCase().includes(search)).forEach(s=>{
-      const st = records[s.name] || "none";
-      const td = document.createElement('td');
-      td.style.fontWeight = "700";
-      if(st === "ders"){ td.style.color = "#064"; td.textContent = "Derste"; }
-      else if(st === "etut"){ td.style.color = "#064"; td.textContent = "Etütte"; }
-      else { td.style.color = "#c0392b"; td.textContent = "Kurumda Yok"; }
-      const tr = document.createElement('tr');
-      tr.appendChild(Object.assign(document.createElement('td'),{className:'name',textContent:s.name}));
-      tr.appendChild(Object.assign(document.createElement('td'),{textContent:s.class}));
-      tr.appendChild(td);
-      tbody.appendChild(tr);
-    });
-  } catch(e){
-    console.error("renderParentView error", e);
-    alert("Veli görünümü alınırken hata oluştu.");
-  }
-}
-
-// -------------------- Login modal handling --------------------
-function openLoginModal(){ overlay.style.display='block'; loginModal.style.display='block'; showLoginForm('teacher'); }
-function closeLoginModal(){ overlay.style.display='none'; loginModal.style.display='none'; }
-
-function showLoginForm(type){
-  const area = document.getElementById('loginFormArea');
-  area.style.display = 'block';
-  area.innerHTML = '';
-  if(type==='teacher'){
-    area.innerHTML = `
-      <label>Öğretmen Adı</label>
-      <input id="loginTeacherName" placeholder="Ad Soyad" />
-      <div style="display:flex;gap:8px;justify-content:center">
-        <button class="btn btn-primary" id="doTeacherLogin">Giriş Yap (Öğretmen)</button>
-      </div>
-    `;
-    document.getElementById('doTeacherLogin').addEventListener('click', ()=> {
-      const name = document.getElementById('loginTeacherName').value.trim();
-      if(!name){ alert("Adınızı girin."); return; }
-      loggedIn = { role:'teacher', name };
-      document.getElementById('headerSubtitle').textContent = `Öğretmen: ${name}`;
-      closeLoginModal();
-      // enable editing UI
-      enableTeacherMode();
-    });
+function login(role) {
+  document.getElementById('login-screen').classList.add('hidden');
+  if (role === 'teacher') {
+    document.getElementById('teacher-panel').classList.remove('hidden');
+    renderTeacherList();
   } else {
-    area.innerHTML = `
-      <label>Veli / Misafir</label>
-      <div style="display:flex;gap:8px;justify-content:center">
-        <button class="btn btn-primary" id="doParentView">Veli Olarak Devam Et</button>
-      </div>
-    `;
-    document.getElementById('doParentView').addEventListener('click', ()=>{
-      loggedIn = { role:'parent', name: 'Veli' };
-      document.getElementById('headerSubtitle').textContent = `Veli Paneli`;
-      closeLoginModal();
-      enableParentMode();
-      renderParentView();
-    });
+    document.getElementById('parent-panel').classList.remove('hidden');
+    renderParentList();
   }
 }
 
-// enable teacher mode: allow editing, show panel button etc.
-function enableTeacherMode(){
-  // show panel button, make sure teacher name input filled
-  document.getElementById('btnPanel').style.display = 'block';
-  document.getElementById('teacherNameInput').value = loggedIn.name || "";
-  // enable click handlers already respect loggedIn.role
-  // show short toast
-  alert("Öğretmen moduna geçildi. Artık yoklama alabilir ve öğrencileri düzenleyebilirsiniz.");
+function logout() {
+  document.getElementById('teacher-panel').classList.add('hidden');
+  document.getElementById('parent-panel').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
 }
 
-// enable parent mode: disable editing features
-function enableParentMode(){
-  document.getElementById('btnPanel').style.display = 'none';
-  // disable teacher controls
-  // hide save button to avoid accidental saving
-  // But keep history view available
-  // show hint
-  document.getElementById('parentHint').textContent = "Veli olarak sadece son kaydedilmiş yoklamayı görürsünüz.";
+function renderTeacherList() {
+  const container = document.getElementById('teacher-students');
+  container.innerHTML = '';
+  students.forEach(name => {
+    const div = document.createElement('div');
+    div.className = 'student-item';
+    div.innerHTML = `
+      <span>${name}</span>
+      <select id="status-${name}">
+        <option value="yok">Yok</option>
+        <option value="derste">Derste</option>
+        <option value="etütte">Etütte</option>
+      </select>`;
+    container.appendChild(div);
+  });
 }
 
-// -------------------- History modal & listing --------------------
-function openHistoryModal(){
-  if(loggedIn.role!== 'teacher' && loggedIn.role!=='parent'){
-    alert("Lütfen giriş yapın.");
+function saveAttendance() {
+  const type = document.getElementById('activity-type').value;
+  const today = new Date().toLocaleDateString('tr-TR');
+  const data = students.map(name => ({
+    ad: name,
+    durum: document.getElementById(`status-${name}`).value,
+    tur: type,
+    tarih: today
+  }));
+  localStorage.setItem('yoklama', JSON.stringify(data));
+  alert('Yoklama kaydedildi!');
+}
+
+function renderParentList() {
+  const container = document.getElementById('parent-students');
+  container.innerHTML = '';
+  const data = JSON.parse(localStorage.getItem('yoklama')) || [];
+  if (data.length === 0) {
+    container.innerHTML = "<p>Henüz yoklama kaydı yok.</p>";
     return;
   }
-  overlay.style.display='block';
-  historyModal.style.display='block';
-  loadHistoryList();
-}
-function closeHistoryModal(){ overlay.style.display='none'; historyModal.style.display='none'; }
-
-function populateHistoryClassFilter(){
-  const sel = document.getElementById('historyClassFilter');
-  sel.innerHTML = `<option value="">Tümü</option>`;
-  const classes = [...new Set(students.map(s=>s.class))].sort();
-  classes.forEach(cls=>{
-    const opt = document.createElement("option"); opt.value = cls; opt.textContent = cls;
-    sel.appendChild(opt);
-  });
-}
-
-async function loadHistoryList(){
-  const container = document.getElementById('historyList');
-  container.innerHTML = "Yükleniyor...";
-  const typeFilter = document.getElementById('historyTypeFilter').value;
-  const classFilter = document.getElementById('historyClassFilter').value;
-  const teacherFilter = (document.getElementById('historyTeacherFilter').value || "").trim().toLowerCase();
-
-  try {
-    let q = query(collection(db,'attendanceLogs'), orderBy('createdAt','desc'));
-    const snap = await getDocs(q);
-    if(snap.empty){ container.innerHTML = "<div>Geçmiş kaydı bulunamadı.</div>"; return; }
-    container.innerHTML = "";
-    snap.docs.forEach(docSnap=>{
-      const d = docSnap.data();
-      // apply simple filters
-      if(typeFilter && d.type !== typeFilter) return;
-      if(classFilter && d.classFilter !== classFilter) return;
-      if(teacherFilter && (!d.teacher || !d.teacher.toLowerCase().includes(teacherFilter))) return;
-      // build card
-      const card = document.createElement('div');
-      card.style.border = "1px solid #eee";
-      card.style.padding = "10px";
-      card.style.marginBottom = "8px";
-      const time = d.createdAt ? (d.createdAt.toDate ? d.createdAt.toDate().toLocaleString() : JSON.stringify(d.createdAt)) : "—";
-      card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-        <div><strong>${d.type === 'etut' ? 'Etüt' : 'Ders'}</strong> — ${d.teacher || '—'} <small style="color:#666">(${time})</small></div>
-        <div style="display:flex;gap:8px">
-          <button class="btn" data-id="${docSnap.id}" data-action="show">Detay</button>
-          ${loggedIn.role==='teacher' ? `<button class="btn btn-danger" data-id="${docSnap.id}" data-action="delete">Sil</button>` : ''}
-        </div>
-      </div>`;
-      // detail expansion
-      const details = document.createElement('div');
-      details.style.marginTop = "8px"; details.style.display="none";
-      const rec = d.records || {};
-      const list = document.createElement('div');
-      for(const name in rec){
-        const st = rec[name];
-        const span = document.createElement('div');
-        span.textContent = `${name} — ${st === 'ders' ? 'Derste' : (st==='etut' ? 'Etütte' : 'Kurumda Yok')}`;
-        if(st==='ders' || st==='etut') { span.style.color = '#064'; span.style.fontWeight='700'; }
-        else { span.style.color = '#c0392b'; span.style.fontWeight='700'; }
-        list.appendChild(span);
-      }
-      details.appendChild(list);
-      card.appendChild(details);
-
-      container.appendChild(card);
-
-      // attach handlers
-      card.querySelectorAll('button').forEach(btn=>{
-        btn.addEventListener('click', async (e)=>{
-          const action = btn.getAttribute('data-action');
-          const id = btn.getAttribute('data-id');
-          if(action==='show'){
-            details.style.display = details.style.display==='none' ? 'block' : 'none';
-          } else if(action==='delete'){
-            if(!confirm("Bu yoklama kaydını silmek istediğinize emin misiniz?")) return;
-            try {
-              await deleteDoc(doc(db,'attendanceLogs',id));
-              alert("Kayıt silindi.");
-              loadHistoryList();
-            } catch(err){
-              console.error("delete history error", err);
-              alert("Silme işlemi sırasında hata oluştu.");
-            }
-          }
-        });
-      });
-    });
-  } catch(e){
-    console.error("loadHistoryList error", e);
-    container.innerHTML = "<div>Yüklenirken hata oluştu.</div>";
-  }
-}
-
-// CSV export of history (current shown list) - simple export of latest N logs
-async function exportHistoryCSV(){
-  try {
-    const q = query(collection(db,'attendanceLogs'), orderBy('createdAt','desc'));
-    const snap = await getDocs(q);
-    if(snap.empty){ alert("Dışa aktarılacak kayıt yok."); return; }
-    // build CSV rows: id,type,teacher,date,student,status
-    let csv = 'id,type,teacher,date,student,status\n';
-    for(const docSnap of snap.docs){
-      const d = docSnap.data();
-      const id = docSnap.id;
-      const date = d.createdAt ? (d.createdAt.toDate ? d.createdAt.toDate().toISOString() : '') : '';
-      const rec = d.records || {};
-      for(const name in rec){
-        csv += `"${id}","${d.type}","${(d.teacher||'') }","${date}","${name}","${rec[name]}"\n`;
-      }
+  data.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'student-item';
+    let statusClass = '';
+    let statusText = '';
+    if (item.durum === 'derste') {
+      statusClass = 'status-derste';
+      statusText = 'Derste ✅';
+    } else if (item.durum === 'etütte') {
+      statusClass = 'status-etutte';
+      statusText = 'Etütte ✅';
+    } else {
+      statusClass = 'status-yok';
+      statusText = 'Kurumda Yok ❌';
     }
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `attendance_history_${new Date().toISOString()}.csv`;
-    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-  } catch(e){
-    console.error("exportHistoryCSV error", e);
-    alert("CSV dışa aktarımı sırasında hata oluştu.");
-  }
-}
-
-// -------------------- Small helpers --------------------
-function populateHistoryClassFilter(){
-  const sel = document.getElementById('historyClassFilter');
-  sel.innerHTML = `<option value="">Tümü</option>`;
-  const classes = [...new Set(students.map(s=>s.class))].sort();
-  classes.forEach(cls=>{
-    const opt = document.createElement("option"); opt.value = cls; opt.textContent = cls;
-    sel.appendChild(opt);
+    div.innerHTML = `<span>${item.ad}</span><span class="${statusClass}">${statusText}</span>`;
+    container.appendChild(div);
   });
 }
-
-// -------------------- End of module --------------------
 </script>
-
 </body>
 </html>
