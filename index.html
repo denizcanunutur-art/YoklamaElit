@@ -1,182 +1,498 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elit Eğitim Kurumu Yoklama Sistemi</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Elit Eğitim Kurumu - Yoklama Sistemi (Şifreli Öğretmen Girişi)</title>
 <style>
-  :root {
-    --green: #2ecc71;
-    --red: #e74c3c;
-    --blue: #2d6cdf;
-    --light: #f7f9fb;
-  }
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: url('background.jpg') no-repeat center center fixed;
-    background-size: cover;
-    margin: 0;
-    padding: 0;
-    color: #333;
-  }
-  .container {
-    max-width: 500px;
-    margin: 80px auto;
-    background: rgba(255,255,255,0.9);
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.3);
-    text-align: center;
-  }
-  h1 { color: var(--blue); margin-bottom: 20px; }
-  button {
-    padding: 12px 20px;
-    font-size: 17px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin: 10px;
-  }
-  .teacher-btn { background: var(--blue); color: #fff; }
-  .parent-btn { background: var(--green); color: #fff; }
-  .hidden { display: none; }
-  select, input {
-    padding: 10px;
-    margin: 10px;
-    font-size: 16px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
-  .student-list { text-align: left; margin-top: 20px; }
-  .student-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    padding: 8px;
-    background: #f9f9f9;
-    border-radius: 6px;
-  }
-  .save-btn { background: var(--green); color: white; width: 100%; margin-top: 15px; }
-  .status-derste { color: var(--green); font-weight: 600; }
-  .status-etutte { color: var(--green); font-weight: 600; }
-  .status-yok { color: var(--red); font-weight: 600; }
-  .logout { background: var(--red); color: white; width: 100%; margin-top: 20px; }
+:root{--red:#e74c3c;--blue:#2463d6;--green:#25a76a;--muted:#f7f7f7;--card:#fff;--text:#222}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial,sans-serif;color:var(--text)}
+body{
+  background: url('background.jpg') center/cover no-repeat fixed;
+  display:flex;flex-direction:column;min-height:100vh;padding:18px;gap:18px;
+}
+header{background:rgba(255,255,255,0.92);padding:14px 18px;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,0.08);text-align:center}
+header h1{margin:0;font-size:20px}
+header h2{margin:4px 0 0 0;font-size:13px;color:#666;font-weight:600}
+
+/* same layout from before (kept concise) */
+.layout{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;justify-content:center}
+.panel{background:rgba(255,255,255,0.96);padding:14px;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,0.06);min-width:320px;max-width:720px;flex:1}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+select,input[type="text"],input[type="password"],button{padding:8px;border-radius:8px;border:1px solid #e3e3e3}
+button{cursor:pointer}
+.btn-primary{background:var(--blue);color:white;border:0}
+.btn-danger{background:var(--red);color:white;border:0}
+.btn-ghost{background:transparent;border:1px solid #ddd}
+
+/* table */
+.table-wrap{max-height:420px;overflow:auto;border-radius:8px;border:1px solid #eee;background:var(--card);margin-top:8px}
+table{width:100%;border-collapse:collapse}
+thead th{position:sticky;top:0;background:#fafafa;padding:10px;border-bottom:1px solid #eee;text-align:left;font-weight:700}
+tbody td{padding:10px;border-bottom:1px solid #f3f3f3}
+td.name{font-weight:700}
+.status-cell{width:160px;text-align:center;cursor:pointer;border-radius:8px;padding:8px;font-weight:700}
+.status-none{background:transparent;color:#444}
+.status-ders{background:#e6fff0;color:#046}
+.status-etut{background:#e6fff0;color:#046}
+.status-absent{background:#ffecec;color:#8a1b1b}
+
+/* modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:50}
+.modal{background:white;padding:18px;border-radius:12px;max-width:520px;min-width:280px;box-shadow:0 18px 40px rgba(0,0,0,0.25)}
+.hidden{display:none}
+.small{font-size:13px;color:#666}
+.flex-between{display:flex;justify-content:space-between;align-items:center}
 </style>
 </head>
 <body>
 
-<div class="container" id="login-screen">
-  <h1>Elit Eğitim Kurumu</h1>
-  <p>Yoklama Sistemine Giriş Yapın</p>
-  <button class="teacher-btn" onclick="login('teacher')">👩‍🏫 Öğretmen Girişi</button>
-  <button class="parent-btn" onclick="login('parent')">👨‍👩‍👧‍👦 Veli Girişi</button>
+<header>
+  <h1>Elit Eğitim Kurumu - Yoklama Sistemi</h1>
+  <h2 id="subTitle">Giriş yapın — Öğretmen (şifreli) veya Veli</h2>
+</header>
+
+<div class="layout">
+  <section class="panel" id="teacherPanel" aria-hidden="true">
+    <div class="flex-between">
+      <h3>Öğretmen Paneli</h3>
+      <div id="teacherModeBadge" class="small">Oturum kapalı</div>
+    </div>
+    <div class="controls">
+      <label>Yoklama Türü:</label>
+      <select id="attendanceType"><option value="etut">Etüt</option><option value="ders">Ders</option></select>
+      <label>Öğretmen adı:</label>
+      <input type="text" id="teacherName" placeholder="Ad Soyad" style="min-width:160px" />
+      <button id="changePasswordBtn" class="btn-ghost">Şifre Değiştir</button>
+    </div>
+    <div class="table-wrap">
+      <table id="studentsTable"><thead><tr><th>İsim</th><th>Sınıf</th><th>Durum (tıklayarak değiştir)</th></tr></thead><tbody></tbody></table>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <button id="saveAttendance" class="btn-primary">Yoklamayı Kaydet</button>
+      <button id="openHistory" class="btn-ghost">Geçmişi Gör</button>
+      <button id="openManage" class="btn-ghost">Öğrenci Yönetimi</button>
+      <button id="logoutTeacher" class="btn-ghost">Çıkış</button>
+    </div>
+    <p class="small">Durum döngüsü: (boş) → Derste → Etütte → Kurumda Yok → (boş)</p>
+  </section>
+
+  <section class="panel" id="parentPanel" aria-hidden="true">
+    <div class="flex-between"><h3>Veli Paneli</h3><div id="parentModeBadge" class="small">Oturum kapalı</div></div>
+    <div class="controls">
+      <label>Öğrenci ara:</label><input type="text" id="parentSearch" placeholder="İsim ile filtrele" />
+      <label style="margin-left:8px">Veli için çocuğu seç:</label><select id="parentSelect"><option value="">(Tümü)</option></select>
+      <button id="refreshParent" class="btn-ghost">Güncelle</button>
+    </div>
+    <div class="table-wrap"><table id="parentTable"><thead><tr><th>İsim</th><th>Sınıf</th><th>Durum</th></tr></thead><tbody></tbody></table></div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <button id="openHistoryFromParent" class="btn-ghost">Geçmişi Gör</button>
+      <button id="logoutParent" class="btn-ghost">Çıkış</button>
+    </div>
+    <p class="small">Yeşil = Kurumda (Derste / Etütte), Kırmızı = Kurumda değil</p>
+  </section>
 </div>
 
-<!-- Öğretmen Paneli -->
-<div class="container hidden" id="teacher-panel">
-  <h2>Öğretmen Paneli</h2>
-  <label>Tür Seç:</label>
-  <select id="activity-type">
-    <option value="ders">Ders</option>
-    <option value="etüt">Etüt</option>
-  </select>
+<!-- manage modal -->
+<div class="modal-backdrop" id="manageBackdrop"><div class="modal" id="manageModal">
+  <h3>Öğrenci Yönetimi</h3>
+  <div style="display:flex;gap:8px;margin:8px 0">
+    <input id="newStudentName" placeholder="Ad Soyad" />
+    <input id="newStudentClass" placeholder="Sınıf (örn: 11Say)" />
+    <input id="newStudentPhone" placeholder="Tel (opsiyonel)" />
+    <button id="addStudentBtn" class="btn-primary">Ekle</button>
+  </div>
+  <div class="table-wrap" style="max-height:240px;margin-top:8px">
+    <table id="manageTable"><thead><tr><th>İsim</th><th>Sınıf</th><th>İşlem</th></tr></thead><tbody></tbody></table>
+  </div>
+  <div style="text-align:right;margin-top:8px"><button id="closeManage" class="btn-ghost">Kapat</button></div>
+</div></div>
 
-  <div class="student-list" id="teacher-students"></div>
-  <button class="save-btn" onclick="saveAttendance()">Yoklamayı Kaydet</button>
-  <button class="logout" onclick="logout()">Çıkış</button>
-</div>
+<!-- login modal (şifreli öğretmen + hesap oluşturma) -->
+<div class="modal-backdrop" id="loginBackdrop"><div class="modal" id="loginModal">
+  <h3>Giriş Yap</h3>
+  <div style="display:flex;gap:10px;justify-content:center;margin:12px 0">
+    <button id="btnTeacherLogin" class="btn-primary">👩‍🏫 Öğretmen Girişi</button>
+    <button id="btnParentLogin" class="btn-primary" style="background:var(--green)">👨‍👩‍👧‍👦 Veli Girişi</button>
+  </div>
 
-<!-- Veli Paneli -->
-<div class="container hidden" id="parent-panel">
-  <h2>Veli Paneli</h2>
-  <p>Öğrencilerin Güncel Durumu:</p>
-  <div class="student-list" id="parent-students"></div>
-  <button class="logout" onclick="logout()">Çıkış</button>
-</div>
+  <div id="loginArea" class="hidden"></div>
+
+  <div style="text-align:center;margin-top:8px"><button id="closeLogin" class="btn-ghost">Kapat</button></div>
+  <p class="small" style="margin-top:10px">Not: Öğretmen oluşturma için kurumunuzun <strong>setup kodu</strong> gereklidir.</p>
+</div></div>
+
+<!-- password change modal -->
+<div class="modal-backdrop" id="pwBackdrop"><div class="modal" id="pwModal">
+  <h3>Şifre Değiştir</h3>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <input id="oldPw" type="password" placeholder="Mevcut şifre" />
+    <input id="newPw" type="password" placeholder="Yeni şifre" />
+    <input id="confirmNewPw" type="password" placeholder="Yeni şifre (tekrar)" />
+    <div style="text-align:right"><button id="doChangePw" class="btn-primary">Kaydet</button> <button id="closePw" class="btn-ghost">İptal</button></div>
+  </div>
+</div></div>
+
+<!-- history modal (same as before) -->
+<div class="modal-backdrop" id="historyBackdrop"><div class="modal" id="historyModal">
+  <h3>Yoklama Geçmişi</h3>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0">
+    <label>Tür:</label><select id="histType"><option value="">Tümü</option><option value="etut">Etüt</option><option value="ders">Ders</option></select>
+    <label>Sınıf:</label><select id="histClass"><option value="">Tümü</option></select>
+    <label>Öğretmen:</label><input id="histTeacher" placeholder="İsim ara" />
+    <button id="histRefresh" class="btn-ghost">Yenile</button>
+    <button id="histExport" class="btn-primary">CSV İndir</button>
+  </div>
+  <div class="history-list" id="historyList" style="max-height:50vh;overflow:auto"></div>
+  <div style="text-align:right;margin-top:8px"><button id="closeHistory" class="btn-ghost">Kapat</button></div>
+</div></div>
 
 <script>
-const students = [
-  "İrem Korkmaz",
-  "Fatma Özdemir",
-  "Semih Kodaz",
-  "Anıl Boşnak",
-  "Emin Dede"
+/*
+  Özellikler:
+  - Öğretmen girişinde parola zorunlu.
+  - Öğretmen hesapları localStorage'da hashlenmiş parola ile tutulur (key: 'elit_teachers').
+  - Hesap oluşturmak için SETUP_CODE gerekli (kod sabit, admin değiştirir).
+  - Hashing: WebCrypto SHA-256 (tarayıcı tarafı). Bu, üretim için ideal değil; Firebase Auth önerilir.
+*/
+
+/* ---------- Config ---------- */
+const SETUP_CODE = "ELIT-SETUP-2025"; // değiştir lütfen — bu kodla yeni öğretmen hesabı açılır
+
+/* ---------- Util: hash (SHA-256) ---------- */
+async function hashPassword(pw){
+  const enc = new TextEncoder();
+  const data = enc.encode(pw);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+/* ---------- LocalStorage helpers ---------- */
+function readTeachers(){
+  try { return JSON.parse(localStorage.getItem('elit_teachers')||'[]'); }
+  catch(e){ return []; }
+}
+function writeTeachers(arr){ localStorage.setItem('elit_teachers', JSON.stringify(arr)); }
+
+function readStudents(){
+  try { return JSON.parse(localStorage.getItem('elit_students')||'[]'); }
+  catch(e){ return []; }
+}
+function writeStudents(arr){ localStorage.setItem('elit_students', JSON.stringify(arr)); }
+
+function readLogs(){ try { return JSON.parse(localStorage.getItem('elit_attendance_logs')||'[]'); } catch(e){ return []; } }
+function writeLogs(a){ localStorage.setItem('elit_attendance_logs', JSON.stringify(a)); }
+
+/* ---------- Sample data fallback ---------- */
+const SAMPLE_STUDENTS = [
+  { name: "İrem Korkmaz", class: "11Say", phone: "+905444111222" },
+  { name: "Fatma Özdemir", class: "10Tür", phone: "+905555222333" },
+  { name: "Semih Kodaz", class: "12Fen", phone: "+905551112223" },
+  { name: "Anıl Boşnak", class: "9Mat", phone: "+905553332221" },
+  { name: "Emin Dede", class: "11Say", phone: "+905559998877" }
 ];
 
-function login(role) {
-  document.getElementById('login-screen').classList.add('hidden');
-  if (role === 'teacher') {
-    document.getElementById('teacher-panel').classList.remove('hidden');
-    renderTeacherList();
-  } else {
-    document.getElementById('parent-panel').classList.remove('hidden');
-    renderParentList();
-  }
+/* ---------- Initialize storage if empty ---------- */
+if(!readStudents().length){ writeStudents(SAMPLE_STUDENTS.slice()); }
+
+/* ---------- App state ---------- */
+let students = readStudents();
+let statuses = {}; // name -> 'ders'|'etut'|'absent'
+let currentUser = { role:null, name:null };
+
+/* ---------- DOM refs ---------- */
+const qs = s => document.querySelector(s);
+const qsa = s => Array.from(document.querySelectorAll(s));
+const studentsTableBody = qs('#studentsTable tbody');
+const parentTableBody = qs('#parentTable tbody');
+const classFilter = qs('#classFilter');
+const parentSearch = qs('#parentSearch');
+const parentSelect = qs('#parentSelect');
+const subTitle = qs('#subTitle');
+
+/* ---------- Init UI ---------- */
+function initUI(){
+  populateClassFilter();
+  populateParentSelect();
+  renderStudentsTable();
+  renderParentTable();
+  attachEvents();
+  openLogin();
+}
+function populateClassFilter(){
+  const classes = Array.from(new Set(students.map(s=>s.class))).sort();
+  classFilter.innerHTML = '<option value="">Tümü</option>' + classes.map(c=>`<option value="${c}">${c}</option>`).join('');
+  qs('#histClass').innerHTML = '<option value="">Tümü</option>' + classes.map(c=>`<option value="${c}">${c}</option>`).join('');
+}
+function populateParentSelect(){
+  parentSelect.innerHTML = '<option value="">(Tümü)</option>' + students.map(s=>`<option value="${s.name}">${s.name} — ${s.class}</option>`).join('');
 }
 
-function logout() {
-  document.getElementById('teacher-panel').classList.add('hidden');
-  document.getElementById('parent-panel').classList.add('hidden');
-  document.getElementById('login-screen').classList.remove('hidden');
-}
-
-function renderTeacherList() {
-  const container = document.getElementById('teacher-students');
-  container.innerHTML = '';
-  students.forEach(name => {
-    const div = document.createElement('div');
-    div.className = 'student-item';
-    div.innerHTML = `
-      <span>${name}</span>
-      <select id="status-${name}">
-        <option value="yok">Yok</option>
-        <option value="derste">Derste</option>
-        <option value="etütte">Etütte</option>
-      </select>`;
-    container.appendChild(div);
+/* ---------- Render teacher table ---------- */
+function renderStudentsTable(){
+  students = readStudents();
+  studentsTableBody.innerHTML = '';
+  const filt = classFilter.value || '';
+  students.filter(s=>!filt || s.class===filt).forEach(s=>{
+    const tr = document.createElement('tr');
+    const tdName = document.createElement('td'); tdName.className='name'; tdName.textContent = s.name;
+    const tdClass = document.createElement('td'); tdClass.textContent = s.class;
+    const tdStatus = document.createElement('td'); tdStatus.className='status-cell';
+    const cur = statuses[s.name] || '';
+    tdStatus.className = 'status-cell ' + (cur ? `status-${cur}` : 'status-none');
+    tdStatus.textContent = cur ? (cur==='ders'?'Derste':(cur==='etut'?'Etütte':'Kurumda Yok')) : '-';
+    tdStatus.addEventListener('click', ()=>{ if(currentUser.role!=='teacher'){ alert('Öğretmen girişi gereklidir.'); return; } cycleStatus(s.name); });
+    tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
+    studentsTableBody.appendChild(tr);
   });
 }
 
-function saveAttendance() {
-  const type = document.getElementById('activity-type').value;
-  const today = new Date().toLocaleDateString('tr-TR');
-  const data = students.map(name => ({
-    ad: name,
-    durum: document.getElementById(`status-${name}`).value,
-    tur: type,
-    tarih: today
-  }));
-  localStorage.setItem('yoklama', JSON.stringify(data));
-  alert('Yoklama kaydedildi!');
-}
-
-function renderParentList() {
-  const container = document.getElementById('parent-students');
-  container.innerHTML = '';
-  const data = JSON.parse(localStorage.getItem('yoklama')) || [];
-  if (data.length === 0) {
-    container.innerHTML = "<p>Henüz yoklama kaydı yok.</p>";
-    return;
-  }
-  data.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'student-item';
-    let statusClass = '';
-    let statusText = '';
-    if (item.durum === 'derste') {
-      statusClass = 'status-derste';
-      statusText = 'Derste ✅';
-    } else if (item.durum === 'etütte') {
-      statusClass = 'status-etutte';
-      statusText = 'Etütte ✅';
-    } else {
-      statusClass = 'status-yok';
-      statusText = 'Kurumda Yok ❌';
-    }
-    div.innerHTML = `<span>${item.ad}</span><span class="${statusClass}">${statusText}</span>`;
-    container.appendChild(div);
+/* ---------- Parent view ---------- */
+function renderParentTable(){
+  students = readStudents();
+  parentTableBody.innerHTML = '';
+  const search = (parentSearch.value||'').trim().toLowerCase();
+  const selected = parentSelect.value || '';
+  const logs = readLogs();
+  const latest = logs.length ? logs[logs.length-1] : null;
+  students.forEach(s=>{
+    if(search && !s.name.toLowerCase().includes(search)) return;
+    if(selected && s.name !== selected) return;
+    const tr = document.createElement('tr');
+    tr.appendChild(Object.assign(document.createElement('td'),{className:'name',textContent:s.name}));
+    tr.appendChild(Object.assign(document.createElement('td'),{textContent:s.class}));
+    const td = document.createElement('td'); td.style.fontWeight='700';
+    let st = 'absent';
+    if(latest && latest.records && Object.prototype.hasOwnProperty.call(latest.records,s.name)) st = latest.records[s.name];
+    if(st==='ders' || st==='etut'){ td.style.color = 'var(--green)'; td.textContent = st==='ders'?'Derste':'Etütte'; }
+    else { td.style.color = 'var(--red)'; td.textContent = 'Kurumda Yok'; }
+    tr.appendChild(td);
+    parentTableBody.appendChild(tr);
   });
 }
+
+/* ---------- Status cycle ---------- */
+function cycleStatus(name){
+  const cur = statuses[name];
+  if(!cur) statuses[name] = 'ders';
+  else if(cur==='ders') statuses[name] = 'etut';
+  else if(cur==='etut') statuses[name] = 'absent';
+  else delete statuses[name];
+  renderStudentsTable(); renderParentTable();
+}
+
+/* ---------- Manage students ---------- */
+function openManage(){
+  if(currentUser.role!=='teacher'){ alert('Öğretmen girişi gereklidir.'); return; }
+  qs('#manageBackdrop').style.display='flex'; renderManageTable();
+}
+function closeManage(){ qs('#manageBackdrop').style.display='none'; }
+function renderManageTable(){
+  const tbody = qs('#manageTable tbody'); tbody.innerHTML='';
+  students.forEach((s,idx)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${s.name}</td><td>${s.class}</td><td></td>`;
+    const btn = document.createElement('button'); btn.className='btn-danger'; btn.textContent='Sil';
+    btn.addEventListener('click', ()=>{ if(!confirm(s.name+' silinsin mi?')) return; students.splice(idx,1); writeStudents(students); populateClassFilter(); populateParentSelect(); renderStudentsTable(); renderParentTable(); renderManageTable(); });
+    tr.querySelector('td:last-child').appendChild(btn);
+    tbody.appendChild(tr);
+  });
+}
+
+/* ---------- Add student ---------- */
+qs('#addStudentBtn').addEventListener('click', ()=>{
+  const name = (qs('#newStudentName').value||'').trim();
+  const cls = (qs('#newStudentClass').value||'').trim();
+  const phone = (qs('#newStudentPhone').value||'').trim();
+  if(!name||!cls){ alert('İsim ve sınıf girin'); return; }
+  students.push({name, class:cls, phone});
+  writeStudents(students); qs('#newStudentName').value=''; qs('#newStudentClass').value=''; qs('#newStudentPhone').value='';
+  populateClassFilter(); populateParentSelect(); renderStudentsTable(); renderParentTable(); renderManageTable();
+});
+
+/* ---------- Save attendance ---------- */
+qs('#saveAttendance').addEventListener('click', ()=>{
+  if(currentUser.role!=='teacher'){ alert('Öğretmen girişi gereklidir.'); return; }
+  const teacher = (qs('#teacherName').value||currentUser.name||'').trim();
+  if(!teacher && !confirm('Öğretmen adı boş. Kaydetmek istiyor musunuz?')) return;
+  const type = qs('#attendanceType').value || 'etut';
+  const classFilterVal = classFilter.value || '';
+  const records = {};
+  students.filter(s=>!classFilterVal || s.class===classFilterVal).forEach(s=> records[s.name] = statuses[s.name] || 'absent' );
+  const logs = readLogs();
+  const entry = { id: 'id_'+Date.now().toString(36), timestamp: new Date().toISOString(), type, teacher, classFilter: classFilterVal, records };
+  logs.push(entry); writeLogs(logs);
+  alert('Yoklama kaydedildi.');
+  renderParentTable();
+});
+
+/* ---------- History ---------- */
+function openHistory(){ qs('#historyBackdrop').style.display='flex'; renderHistory(); }
+function closeHistoryModal(){ qs('#historyBackdrop').style.display='none'; }
+function renderHistory(){
+  const list = readLogs().slice().reverse();
+  const typeF = qs('#histType').value || ''; const classF = qs('#histClass').value || ''; const teacherF = (qs('#histTeacher').value||'').trim().toLowerCase();
+  const container = qs('#historyList'); container.innerHTML='';
+  const filt = list.filter(l => { if(typeF && l.type!==typeF) return false; if(classF && l.classFilter!==classF) return false; if(teacherF && (!l.teacher||!l.teacher.toLowerCase().includes(teacherF))) return false; return true; });
+  if(!filt.length){ container.innerHTML='<div class="small">Kayıt bulunamadı</div>'; return; }
+  filt.forEach(l=>{
+    const card = document.createElement('div'); card.style.border='1px solid #eee'; card.style.padding='8px'; card.style.marginBottom='8px';
+    const time = new Date(l.timestamp).toLocaleString();
+    card.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${l.type==='etut'?'Etüt':'Ders'}</strong> — ${l.teacher||'—'} <div class="small">${time} ${l.classFilter?('— '+l.classFilter):''}</div></div><div></div></div>`;
+    const details = document.createElement('div'); details.style.marginTop='8px'; details.style.display='none';
+    Object.keys(l.records||{}).forEach(n=>{
+      const st = l.records[n];
+      const d = document.createElement('div'); d.textContent = `${n} — ${st==='ders'?'Derste':(st==='etut'?'Etütte':'Kurumda Yok')}`;
+      d.style.fontWeight='700'; d.style.color = (st==='ders'||st==='etut')? 'var(--green)' : 'var(--red)';
+      details.appendChild(d);
+    });
+    const btns = card.querySelector('div > div:last-child');
+    const btnShow = document.createElement('button'); btnShow.className='btn-ghost'; btnShow.textContent='Detay'; btnShow.addEventListener('click', ()=> details.style.display = details.style.display==='none'?'block':'none');
+    btns.appendChild(btnShow);
+    if(currentUser.role==='teacher'){ const btnDel = document.createElement('button'); btnDel.className='btn-danger'; btnDel.textContent='Sil'; btnDel.style.marginLeft='6px'; btnDel.addEventListener('click', ()=>{ if(!confirm('Silinsin mi?')) return; const all = readLogs(); const idx = all.findIndex(x=>x.id===l.id); if(idx>-1){ all.splice(idx,1); writeLogs(all); renderHistory(); alert('Silindi'); renderParentTable(); } }); btns.appendChild(btnDel); }
+    card.appendChild(details); container.appendChild(card);
+  });
+}
+
+/* ---------- CSV export ---------- */
+qs('#histExport').addEventListener('click', ()=>{
+  const logs = readLogs(); if(!logs.length){ alert('Dışa aktarılacak kayıt yok'); return; }
+  const rows = ['id,type,teacher,date,classFilter,student,status'];
+  logs.forEach(l=>{ Object.keys(l.records||{}).forEach(n=> rows.push(`${l.id},${l.type},${(l.teacher||'')},${l.timestamp},${l.classFilter||''},"${n}",${l.records[n]}`)); });
+  const blob = new Blob([rows.join('\n')], { type:'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download = `attendance_all_${new Date().toISOString()}.csv`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
+
+/* ---------- Login flow (şifreli teacher) ---------- */
+qs('#btnTeacherLogin').addEventListener('click', ()=> showTeacherLogin());
+qs('#btnParentLogin').addEventListener('click', ()=> doParentContinue());
+qs('#closeLogin').addEventListener('click', ()=> qs('#loginBackdrop').style.display='none');
+
+function openLogin(){ qs('#loginBackdrop').style.display='flex'; qs('#loginArea').classList.add('hidden'); qs('#loginArea').innerHTML=''; }
+function showTeacherLogin(){
+  qs('#loginArea').classList.remove('hidden');
+  qs('#loginArea').innerHTML = `
+    <label>Öğretmen Adı</label><input id="loginTeacherName" placeholder="Ad Soyad" style="width:100%;margin:6px 0;padding:8px;border-radius:8px;border:1px solid #eee" />
+    <label>Şifre</label><input id="loginTeacherPw" type="password" placeholder="Şifre" style="width:100%;margin:6px 0;padding:8px;border-radius:8px;border:1px solid #eee" />
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
+      <button id="doTeacherLogin" class="btn-primary">Giriş Yap</button>
+      <button id="doTeacherRegister" class="btn-ghost">Hesap Oluştur</button>
+    </div>
+    <div class="small" style="margin-top:8px">Hesap oluşturmak için kurum <strong>setup kodunu</strong> girmeniz gerekecek.</div>
+  `;
+  qs('#doTeacherLogin').addEventListener('click', async ()=>{
+    const name = (qs('#loginTeacherName').value||'').trim();
+    const pw = (qs('#loginTeacherPw').value||'').trim();
+    if(!name || !pw){ alert('İsim ve şifre girin'); return; }
+    const teachers = readTeachers();
+    const t = teachers.find(x=>x.name.toLowerCase()===name.toLowerCase());
+    if(!t){ alert('Bu isimde öğretmen bulunamadı. Hesap oluşturabilirsiniz.'); return; }
+    const h = await hashPassword(pw);
+    if(h === t.hash){ // success
+      currentUser = { role:'teacher', name: t.name };
+      qs('#loginBackdrop').style.display='none'; subTitle.textContent = `Öğretmen: ${t.name}`; enableTeacherMode();
+      return;
+    } else { alert('Şifre hatalı'); return; }
+  });
+  qs('#doTeacherRegister').addEventListener('click', ()=> showTeacherRegister());
+}
+
+function showTeacherRegister(){
+  const html = `
+    <label>Setup Kodu</label><input id="regSetup" placeholder="Kurulum kodu" style="width:100%;margin:6px 0;padding:8px;border-radius:8px;border:1px solid #eee" />
+    <label>Öğretmen Adı</label><input id="regName" placeholder="Ad Soyad" style="width:100%;margin:6px 0;padding:8px;border-radius:8px;border:1px solid #eee" />
+    <label>Şifre</label><input id="regPw" type="password" placeholder="Şifre" style="width:100%;margin:6px 0;padding:8px;border-radius:8px;border:1px solid #eee" />
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
+      <button id="doRegister" class="btn-primary">Hesap Oluştur</button>
+    </div>
+  `;
+  qs('#loginArea').innerHTML = html;
+  qs('#doRegister').addEventListener('click', async ()=>{
+    const code = (qs('#regSetup').value||'').trim();
+    const name = (qs('#regName').value||'').trim();
+    const pw = (qs('#regPw').value||'').trim();
+    if(!code||!name||!pw){ alert('Tüm alanları doldurun'); return; }
+    if(code !== SETUP_CODE){ alert('Setup kodu geçersiz'); return; }
+    const teachers = readTeachers();
+    if(teachers.find(t=>t.name.toLowerCase()===name.toLowerCase())){ alert('Bu isimde öğretmen zaten kayıtlı'); return; }
+    const h = await hashPassword(pw);
+    teachers.push({ name, hash: h });
+    writeTeachers(teachers);
+    alert('Öğretmen hesabı oluşturuldu. Giriş yapabilirsiniz.');
+    // optionally auto-login:
+    currentUser = { role:'teacher', name };
+    qs('#loginBackdrop').style.display='none'; subTitle.textContent = `Öğretmen: ${name}`; enableTeacherMode();
+  });
+}
+
+function doParentContinue(){
+  currentUser = { role:'parent', name:'Veli' };
+  qs('#loginBackdrop').style.display='none'; subTitle.textContent = 'Veli Paneli'; enableParentMode();
+}
+
+/* ---------- Enable modes ---------- */
+function enableTeacherMode(){
+  qs('#teacherPanel').style.display='block';
+  qs('#parentPanel').style.display='none';
+  qs('#teacherModeBadge').textContent = `Oturum: ${currentUser.name}`;
+  qs('#teacherName').value = currentUser.name;
+  renderStudentsTable();
+}
+function enableParentMode(){
+  qs('#parentPanel').style.display='block';
+  qs('#teacherPanel').style.display='none';
+  qs('#parentModeBadge').textContent = 'Veli olarak giriş yapıldı';
+  renderParentTable();
+}
+
+/* ---------- Logout ---------- */
+qs('#logoutTeacher').addEventListener('click', ()=>{ currentUser={role:null,name:null}; qs('#teacherPanel').style.display='none'; qs('#parentPanel').style.display='none'; subTitle.textContent='Giriş yapın — Öğretmen (şifreli) veya Veli'; openLogin(); });
+qs('#logoutParent').addEventListener('click', ()=>{ currentUser={role:null,name:null}; qs('#teacherPanel').style.display='none'; qs('#parentPanel').style.display='none'; subTitle.textContent='Giriş yapın — Öğretmen (şifreli) veya Veli'; openLogin(); });
+
+/* ---------- Password change ---------- */
+qs('#changePasswordBtn').addEventListener('click', ()=>{
+  if(currentUser.role!=='teacher'){ alert('Öğretmen girişi gereklidir.'); return; }
+  qs('#pwBackdrop').style.display='flex';
+});
+qs('#closePw').addEventListener('click', ()=> qs('#pwBackdrop').style.display='none');
+qs('#doChangePw').addEventListener('click', async ()=>{
+  const oldPw = (qs('#oldPw').value||'').trim();
+  const newPw = (qs('#newPw').value||'').trim();
+  const confirmNew = (qs('#confirmNewPw').value||'').trim();
+  if(!oldPw || !newPw){ alert('Tüm alanları doldurun'); return; }
+  if(newPw !== confirmNew){ alert('Yeni şifreler eşleşmiyor'); return; }
+  const teachers = readTeachers();
+  const tIdx = teachers.findIndex(t=>t.name.toLowerCase()===currentUser.name.toLowerCase());
+  if(tIdx===-1){ alert('Öğretmen bulunamadı'); return; }
+  const oldHash = await hashPassword(oldPw);
+  if(oldHash !== teachers[tIdx].hash){ alert('Mevcut şifre yanlış'); return; }
+  const newHash = await hashPassword(newPw); teachers[tIdx].hash = newHash; writeTeachers(teachers);
+  alert('Şifreniz değiştirildi'); qs('#pwBackdrop').style.display='none'; qs('#oldPw').value=''; qs('#newPw').value=''; qs('#confirmNewPw').value='';
+});
+
+/* ---------- Events wiring ---------- */
+function attachEvents(){
+  classFilter.addEventListener('change', ()=> renderStudentsTable());
+  parentSearch.addEventListener('input', ()=> renderParentTable());
+  parentSelect.addEventListener('change', ()=> renderParentTable());
+  qs('#refreshParent').addEventListener('click', ()=>{ renderParentTable(); alert('Güncellendi'); });
+  qs('#openManage').addEventListener('click', ()=> openManage());
+  qs('#closeManage').addEventListener('click', ()=> closeManage());
+  qs('#manageBackdrop').addEventListener('click', (e)=>{ if(e.target === qs('#manageBackdrop')) closeManage(); });
+  qs('#parentSearch').addEventListener('input', ()=> renderParentTable());
+  qs('#openHistory').addEventListener('click', ()=> { openHistory(); });
+  qs('#openHistoryFromParent').addEventListener('click', ()=> openHistory());
+  qs('#historyBackdrop').addEventListener('click', (e)=>{ if(e.target === qs('#historyBackdrop')) closeHistoryModal(); });
+  qs('#histRefresh').addEventListener('click', ()=> renderHistory());
+  qs('#histType').addEventListener('change', ()=> renderHistory());
+  qs('#histClass').addEventListener('change', ()=> renderHistory());
+  qs('#histExport').addEventListener('click', ()=> { qs('#histExport').click(); }); // handled above
+}
+
+/* ---------- Start ---------- */
+initUI();
+
 </script>
 </body>
 </html>
