@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Elit Eğitim Kurumu - Yoklama Sistemi</title>
 <style>
 :root{--red:#e74c3c;--blue:#2d6cdf;--green:#25d366;--muted:#f7f7f7;--gray:#bdbdbd;}
@@ -81,7 +81,6 @@ tbody tr:hover{background:rgba(0,0,0,0.03);}
 </main>
 
 <script type="module">
-// Firebase import
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
@@ -102,7 +101,6 @@ let activeClassFilter = null;
 let students = [];
 let statuses = {};
 
-// --- Load students ---
 async function loadStudents(){
   students = [];
   const querySnapshot = await getDocs(collection(db,"students"));
@@ -120,7 +118,6 @@ async function loadStudents(){
   }
 }
 
-// --- Update status ---
 async function updateStatus(name,newStatus){
   statuses[name] = newStatus;
   const studentRef = doc(db,"students",name);
@@ -129,7 +126,6 @@ async function updateStatus(name,newStatus){
   else renderStudentsTable();
 }
 
-// --- Render functions ---
 function renderClassButtons(){
   const container = document.getElementById("classButtons"); container.innerHTML="";
   const classes = [...new Set(students.map(s=>s.class))].sort();
@@ -171,7 +167,6 @@ function toggleStatus(name){
   else updateStatus(name,"");
 }
 
-// --- Parent view ---
 function renderParentCards(){
   const container = document.getElementById("parentCards"); container.innerHTML="";
   const searchVal = document.getElementById("parentSearch").value.toLowerCase();
@@ -185,20 +180,19 @@ function renderParentCards(){
   });
 }
 
-// --- Login logic ---
 document.addEventListener("DOMContentLoaded",()=>{
   const loginPanel = document.getElementById("loginPanel");
   const passwordPanel = document.getElementById("passwordPanel");
   const mainPanel = document.querySelector("main");
 
   document.getElementById("teacherBtn").addEventListener("click",()=>{loginPanel.style.display="none"; passwordPanel.style.display="flex";});
-  document.getElementById("teacherLoginBtn").addEventListener("click",()=>{
+  document.getElementById("teacherLoginBtn").addEventListener("click", async ()=>{
     const pw = document.getElementById("teacherPassword").value;
     if(pw==="elit"){
       passwordPanel.style.display="none"; mainPanel.style.display="block"; isParentMode=false;
       document.getElementById("yoklamaPanel").style.display="block";
       document.getElementById("parentTableWrap").style.display="none";
-      loadStudents();
+      await loadStudents();
     } else alert("Şifre yanlış!");
   });
 
