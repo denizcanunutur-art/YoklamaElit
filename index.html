@@ -152,8 +152,8 @@ async function loadStudents(){
 
 async function updateStatus(name,newStatus){
   statuses[name]=newStatus;
-  const studentRef = doc(db,"students",name);
-  await updateDoc(studentRef,{status:newStatus});
+  const studentRef=doc(db,"students",name);
+  await updateDoc(studentRef,{status:newStatus||""});
   if(isParentMode) renderParentCards();
   else renderStudentsTable();
 }
@@ -187,7 +187,13 @@ function renderStudentsTable(){
       else if(st==="absent") tdStatus.classList.add("status-absent");
       else if(st==="present") tdStatus.classList.add("status-present");
       tdStatus.textContent=st ? (st==="absent"?"Yok":"Var") : "-";
-      tdStatus.addEventListener("click",()=>{const next=st==="absent"?"present":"absent"; updateStatus(s.name,next);});
+      tdStatus.addEventListener("click",()=>{
+        let next;
+        if(st==="" || st===undefined) next="absent";
+        else if(st==="absent") next="present";
+        else next="";
+        updateStatus(s.name,next);
+      });
       tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
       tbody.appendChild(tr);
     });
@@ -257,15 +263,16 @@ function renderParentCards(){
   const container=document.getElementById("parentCards");
   container.innerHTML="";
   const searchVal=document.getElementById("parentSearch").value.toLowerCase();
-  students.filter(s=>s.name.toLowerCase().includes(searchVal)).forEach(s=>{
-    const div=document.createElement("div"); div.className="parent-card";
-    const statusDot=document.createElement("span"); statusDot.className="status-dot";
-    if(statuses[s.name]==="present") statusDot.classList.add("status-present");
-    else statusDot.classList.add("status-absent");
-    div.innerHTML=`${s.name} <br/>${s.class}`;
-    div.prepend(statusDot);
-    container.appendChild(div);
-  });
+  students.filter(s=>s.name.toLowerCase().includes(searchVal))
+    .forEach(s=>{
+      const div=document.createElement("div"); div.className="parent-card";
+      const statusDot=document.createElement("span"); statusDot.className="status-dot";
+      if(statuses[s.name]==="present") statusDot.classList.add("status-present");
+      else statusDot.classList.add("status-absent");
+      div.innerHTML=`${s.name} <br/>${s.class}`;
+      div.prepend(statusDot);
+      container.appendChild(div);
+    });
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
