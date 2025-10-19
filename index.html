@@ -5,99 +5,64 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Elit Eğitim Kurumu - Yoklama Sistemi</title>
 <style>
-:root{--red:#e74c3c;--green:#25d366;--blue:#2d6cdf;--muted:#f7f7f7;}
+:root{--red:#e74c3c;--blue:#2d6cdf;--green:#25d366;--muted:#f7f7f7;--gray:#bdbdbd;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:"Montserrat",Arial,sans-serif;min-height:100vh;background:linear-gradient(135deg,#1c2b5b,#3a5ea0);color:#222;}
-#loginPanel{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:linear-gradient(135deg,#1c2b5b,#3a5ea0);z-index:100;}
-#loginBox{display:flex;max-width:900px;width:90%;background:rgba(255,255,255,0.95);border-radius:12px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,0.3);flex-direction:row;min-height:400px;}
-#loginLogo{flex:1;display:flex;justify-content:center;align-items:center;background:#fff;}
-#loginLogo img{max-width:80%;max-height:80%;}
-#loginButtons{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:30px;}
-#loginButtons h2{margin-bottom:30px;font-size:24px;font-weight:700;color:#333;}
-.loginBtn{width:80%;padding:14px 20px;margin:10px 0;font-size:18px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:0.3s;}
-#teacherBtn{background:var(--blue);color:#fff;}
-#teacherBtn:hover{background:#1b4bb8;}
-#parentBtn{background:var(--green);color:#fff;}
-#parentBtn:hover{background:#1aa858;}
-#passwordPanel{display:none;flex-direction:column;align-items:center;}
-#passwordPanel input{width:80%;padding:10px;margin:10px 0;border-radius:8px;border:1px solid #dcdcdc;font-size:16px;}
-#passwordPanel button{margin-top:10px;padding:10px 18px;font-weight:700;border:none;border-radius:8px;background:var(--blue);color:#fff;cursor:pointer;transition:0.3s;}
-#passwordPanel button:hover{background:#1b4bb8;}
-#parentTableWrap{display:none;max-width:900px;margin:20px auto;background:rgba(255,255,255,0.95);border-radius:10px;padding:12px;}
-#parentTableWrap h3{margin-bottom:12px;font-size:22px;text-align:center;}
-#parentSearch{width:100%;padding:8px;margin:10px 0 12px 0;border-radius:6px;border:1px solid #ccc;font-size:16px;}
-#parentTable th, #parentTable td{text-align:left;padding:12px;border-bottom:1px solid #ddd;font-size:16px;}
-.status-dot{display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:8px;}
+body{font-family:"Montserrat",Arial,sans-serif;background:url('elit_logo.png') center/cover no-repeat;color:#222;}
+header{background:rgba(255,255,255,0.92);padding:20px 12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+header h1{margin:0;font-size:28px;font-weight:800;}
+header h1 span{color:var(--red);}
+main{display:flex;gap:18px;padding:18px;flex-wrap:wrap;justify-content:center;display:none;}
+.panel{background:rgba(255,255,255,0.96);border-radius:10px;padding:14px;box-shadow:0 6px 20px rgba(0,0,0,0.05);flex:1 1 420px;min-width:300px;position:relative}
+h3{margin:0 0 10px 0;font-size:18px}
+.table-wrap{max-height:440px;overflow-y:auto;overflow-x:hidden;border-radius:6px;border:1px solid #e6e6e6;background:#fff}
+table{width:100%;border-collapse:collapse;min-width:300px}
+thead th{position:sticky;top:0;background:var(--muted);border-bottom:1px solid #e6e6e6;padding:10px;font-weight:700;text-align:left}
+tbody td{padding:10px;border-bottom:1px solid #f0f0f0;text-align:left}
+tbody tr:hover{background:rgba(0,0,0,0.03)}
+td.name{font-weight:700}
+.status-cell{width:110px;text-align:center;cursor:pointer;border-radius:6px;padding:6px;font-weight:700}
+.status-empty{background:transparent;color:#333}
+.status-absent{background:#ffd8d8;color:#800}
+.status-present{background:#d6ffd9;color:#064}
+.btn{display:inline-block;padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-danger{background:#ff6b6b;color:#fff}
+.btn-wa{background:var(--green);color:#fff}
+.btn-notify{background:#4a69bd;color:#fff;margin-left:10px}
+.btn-panel{position:absolute;right:14px;top:14px;background:var(--gray);color:#fff}
+.btn-class{background:#eee;color:var(--blue);margin:2px;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:700}
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:40}
+#panel{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;width:92%;max-width:520px}
+#panel .panel-inner{background:#fff;padding:18px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.2)}
+.panel-inner input{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #dcdcdc}
+#classButtons{display:flex;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
+.parent-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;max-height:500px;overflow-y:auto;}
+.parent-card{background:#fff;padding:12px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.1);position:relative;display:flex;flex-direction:column;align-items:start;gap:6px;}
+.status-dot{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle;}
 .status-present{background:var(--green);}
 .status-absent{background:var(--red);}
-header{background:rgba(255,255,255,0.92);padding:20px 12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:none;}
-header h1{margin:0;font-size:28px;font-weight:800} header h1 span{color:var(--red);}
-header h2{margin:6px 0 0 0;font-size:15px;color:#555;font-weight:600;}
-main{display:none;padding:18px;justify-content:center;flex-wrap:wrap;gap:18px;}
-.panel{background:rgba(255,255,255,0.96);border-radius:10px;padding:14px;box-shadow:0 6px 20px rgba(0,0,0,0.05);flex:1 1 420px;min-width:300px;position:relative;}
-h3{margin:0 0 10px 0;font-size:18px;}
-.table-wrap{max-height:440px;overflow-y:auto;overflow-x:hidden;border-radius:6px;border:1px solid #e6e6e6;background:#fff;}
-table{width:100%;border-collapse:collapse;}
-thead th{position:sticky;top:0;background:var(--muted);border-bottom:1px solid #e6e6e6;padding:10px;font-weight:700;text-align:left;}
-tbody td{padding:10px;border-bottom:1px solid #f0f0f0;text-align:left;}
-tbody tr:hover{background:rgba(0,0,0,0.03);}
-td.name{font-weight:700;}
-.status-cell{width:110px;text-align:center;cursor:pointer;border-radius:6px;padding:6px;font-weight:700;}
-.status-empty{background:transparent;color:#333;}
-.status-absent{background:#ffd8d8;color:#800;}
-.status-present{background:#d6ffd9;color:#064;}
-.btn{display:inline-block;padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700;}
-.btn-primary{background:var(--blue);color:#fff;}
-.btn-danger{background:#ff6b6b;color:#fff;}
-.btn-wa{background:var(--green);color:#fff;}
-.btn-notify{background:#4a69bd;color:#fff;margin-left:10px;}
-.btn-panel{position:absolute;right:14px;top:14px;background:#bdbdbd;color:#fff;}
-.btn-class{background:#eee;color:var(--blue);margin:2px;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:700;}
-#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:40;}
-#panel{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;width:92%;max-width:520px;}
-#panel .panel-inner{background:#fff;padding:18px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.2);}
-.panel-inner input{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #dcdcdc;}
-#classButtons{display:flex;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
-@media(max-width:900px){main{flex-direction:column;padding:12px}#loginBox{flex-direction:column;min-height:500px;}}
+.parent-search{margin-bottom:12px;padding:8px;width:100%;border-radius:8px;border:1px solid #dcdcdc;}
+@media (max-width:900px){main{flex-direction:column;padding:12px}.table-wrap{max-height:320px}}
+#loginPanel{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:12px;}
+#passwordPanel{display:none;flex-direction:column;align-items:center;gap:8px;}
 </style>
 </head>
 <body>
 
-<!-- Giriş Paneli -->
-<div id="loginPanel">
-  <div id="loginBox">
-    <div id="loginLogo">
-      <img src="IMG_4028.jpeg" alt="Elit Logo">
-    </div>
-    <div id="loginButtons">
-      <h2>Giriş Seçeneğini Seçiniz</h2>
-      <button id="teacherBtn" class="loginBtn">Öğretmen Girişi</button>
-      <button id="parentBtn" class="loginBtn">Veli Girişi</button>
-      <div id="passwordPanel">
-        <input type="password" id="teacherPassword" placeholder="Şifreyi Girin">
-        <button id="teacherLoginBtn">Giriş Yap</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Veli Modu -->
-<div id="parentTableWrap">
-  <h3>Öğrenci Yoklama Listesi</h3>
-  <input type="text" id="parentSearch" placeholder="Öğrenci ara...">
-  <div style="overflow-x:auto;max-height:500px;">
-    <table id="parentTable">
-      <thead><tr><th>İsim</th><th>Sınıf</th><th>Durum</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- Öğretmen Modu -->
-<header>
+<header style="display:none">
   <h1><span>Elit</span> Eğitim Kurumu</h1>
-  <h2>Yoklama Alma Sistemi</h2>
 </header>
+
+<div id="loginPanel">
+  <h2>Giriş Seçenekleri</h2>
+  <button class="btn btn-primary" id="teacherBtn">Öğretmen Girişi</button>
+  <button class="btn btn-primary" id="parentBtn">Veli Girişi</button>
+</div>
+
+<div id="passwordPanel">
+  <input type="password" id="teacherPassword" placeholder="Şifreyi girin"/>
+  <button class="btn btn-primary" id="teacherLoginBtn">Giriş</button>
+</div>
 
 <main>
   <section class="panel" id="yoklamaPanel">
@@ -113,8 +78,7 @@ td.name{font-weight:700;}
   </section>
 
   <section class="panel">
-    <h3 style="display:flex;align-items:center;justify-content:space-between">
-      Etütte Olmayanlar
+    <h3>Etütte Olmayanlar
       <button class="btn btn-notify" id="btnNotify">Kurumu Bilgilendir</button>
     </h3>
     <div style="height:8px"></div>
@@ -124,6 +88,11 @@ td.name{font-weight:700;}
         <tbody></tbody>
       </table>
     </div>
+  </section>
+
+  <section class="panel" id="parentTableWrap" style="display:none">
+    <input type="text" id="parentSearch" class="parent-search" placeholder="Öğrenci ara..."/>
+    <div class="parent-cards" id="parentCards"></div>
   </section>
 </main>
 
@@ -149,9 +118,8 @@ td.name{font-weight:700;}
 </div>
 
 <script type="module">
-// Firebase import
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBka7ReTV8sGjR9GAsJUDkksLSCTHCV9Mk",
@@ -161,138 +129,113 @@ const firebaseConfig = {
   messagingSenderId: "30260081027",
   appId: "1:30260081027:web:9332093cbc19d605d506b6"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const INSTITUTION_PHONE = "+905527112922";
 
+const INSTITUTION_PHONE="+905527112922";
 let isParentMode=false;
+let activeClassFilter=null;
 let students=[];
 let statuses={};
 
-// --- Firebase yükleme ---
 async function loadStudents(){
   students=[];
   const querySnapshot = await getDocs(collection(db,"students"));
-  querySnapshot.forEach(docSnap=>{students.push({...docSnap.data()});});
-  if(isParentMode){ renderParentTable(); }else{ renderClassButtons(); renderStudentsTable(); }
+  querySnapshot.forEach(docSnap=>{
+    const data=docSnap.data();
+    students.push(data);
+    statuses[data.name]=data.status || "";
+  });
+  if(isParentMode) renderParentCards();
+  else { renderClassButtons(); renderStudentsTable(); }
 }
 
-// --- Veli Tablosu ---
-function renderParentTable(){
-  document.getElementById("parentTableWrap").style.display="block";
-  const tbody = document.querySelector("#parentTable tbody");
-  const searchValue = document.getElementById("parentSearch").value.toLowerCase();
-  tbody.innerHTML = "";
-  students
-    .filter(s => s.name.toLowerCase().includes(searchValue))
-    .forEach(s => {
-      const tr = document.createElement("tr");
-      const tdName = document.createElement("td"); tdName.textContent = s.name;
-      const tdClass = document.createElement("td"); tdClass.textContent = s.class;
-      const tdStatus = document.createElement("td");
-      const dot = document.createElement("span");
-      dot.className = "status-dot " + (statuses[s.name]==="absent"?"status-absent":"status-present");
-      tdStatus.appendChild(dot);
-      tdStatus.appendChild(document.createTextNode(statuses[s.name]==="absent"?"Yok":"Var"));
-      tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
-      tbody.appendChild(tr);
-    });
+async function updateStatus(name,newStatus){
+  statuses[name]=newStatus;
+  const studentRef = doc(db,"students",name);
+  await updateDoc(studentRef,{status:newStatus});
+  if(isParentMode) renderParentCards();
+  else renderStudentsTable();
 }
-document.getElementById("parentSearch").addEventListener("input", renderParentTable);
 
-// --- Öğretmen Mod Fonksiyonları ---
 function renderClassButtons(){
-  const container = document.getElementById("classButtons");
-  container.innerHTML = "";
-  const classes = [...new Set(students.map(s=>s.class))].sort();
+  const container=document.getElementById("classButtons");
+  container.innerHTML="";
+  const classes=[...new Set(students.map(s=>s.class))].sort();
   classes.forEach(cls=>{
-    const btn = document.createElement("button");
-    btn.textContent = cls;
-    btn.className = "btn-class";
-    btn.style.color = "var(--blue)";
+    const btn=document.createElement("button");
+    btn.textContent=cls;
+    btn.className="btn-class";
     if(activeClassFilter===cls){btn.style.backgroundColor="var(--blue)";btn.style.color="#fff";}
-    btn.addEventListener("click", ()=>{activeClassFilter=(activeClassFilter===cls)?null:cls; renderStudentsTable(); renderClassButtons();});
+    btn.addEventListener("click",()=>{activeClassFilter=(activeClassFilter===cls)?null:cls; renderStudentsTable(); renderClassButtons();});
     container.appendChild(btn);
   });
 }
 
 function renderStudentsTable(){
-  const tbody = document.querySelector("#studentsTable tbody");
-  tbody.innerHTML = "";
+  const tbody=document.querySelector("#studentsTable tbody");
+  tbody.innerHTML="";
   students.filter(s=>!activeClassFilter || s.class===activeClassFilter)
-  .forEach(s=>{
-    const tr = document.createElement("tr");
-    const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
-    const tdClass = document.createElement("td"); tdClass.textContent=s.class;
-    const tdStatus = document.createElement("td"); tdStatus.className="status-cell";
-    const st = statuses[s.name] || "";
-    tdStatus.classList.remove("status-empty","status-absent","status-present");
-    if(!st) tdStatus.classList.add("status-empty");
-    else if(st==="absent") tdStatus.classList.add("status-absent");
-    else if(st==="present") tdStatus.classList.add("status-present");
-    tdStatus.textContent = st ? (st==="absent"?"Yok":"Var") : "-";
-    tdStatus.addEventListener("click", ()=> toggleStatus(s.name));
-    tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
-    tbody.appendChild(tr);
-  });
+    .forEach(s=>{
+      const tr=document.createElement("tr");
+      const tdName=document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
+      const tdClass=document.createElement("td"); tdClass.textContent=s.class;
+      const tdStatus=document.createElement("td"); tdStatus.className="status-cell";
+      const st=statuses[s.name] || "";
+      tdStatus.classList.remove("status-empty","status-absent","status-present");
+      if(!st) tdStatus.classList.add("status-empty");
+      else if(st==="absent") tdStatus.classList.add("status-absent");
+      else if(st==="present") tdStatus.classList.add("status-present");
+      tdStatus.textContent=st ? (st==="absent"?"Yok":"Var") : "-";
+      tdStatus.addEventListener("click",()=>{const next=st==="absent"?"present":"absent"; updateStatus(s.name,next);});
+      tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
+      tbody.appendChild(tr);
+    });
   renderAbsentTable();
 }
 
-function toggleStatus(name){
-  const cur = statuses[name];
-  if(!cur) statuses[name]="absent";
-  else if(cur==="absent") statuses[name]="present";
-  else delete statuses[name];
-  renderStudentsTable();
-}
-
 function renderAbsentTable(){
-  const tbody = document.querySelector("#absentTable tbody");
-  tbody.innerHTML = "";
-  const absents = students.filter(s=>statuses[s.name]==="absent");
-  absents.forEach(s=>{
-    const tr = document.createElement("tr");
-    const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
-    const tdClass = document.createElement("td"); tdClass.textContent=s.class;
-    const tdBtn = document.createElement("td"); tdBtn.style.textAlign="center";
-    const btn = document.createElement("button"); btn.className="btn btn-wa"; btn.textContent="Gönder";
-    btn.addEventListener("click", ()=> sendIndividualWA(s.phone,s.name));
-    tdBtn.appendChild(btn);
-    tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdBtn);
-    tbody.appendChild(tr);
-  });
+  const tbody=document.querySelector("#absentTable tbody");
+  tbody.innerHTML="";
+  students.filter(s=>statuses[s.name]==="absent")
+    .forEach(s=>{
+      const tr=document.createElement("tr");
+      const tdName=document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
+      const tdClass=document.createElement("td"); tdClass.textContent=s.class;
+      const tdBtn=document.createElement("td"); tdBtn.style.textAlign="center";
+      const btn=document.createElement("button"); btn.className="btn btn-wa"; btn.textContent="Gönder";
+      btn.addEventListener("click",()=>sendIndividualWA(s.phone,s.name));
+      tdBtn.appendChild(btn);
+      tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdBtn);
+      tbody.appendChild(tr);
+    });
 }
 
-// WhatsApp
 function sendIndividualWA(phone,name){
-  const msg = `Merhabalar Öğrencimiz ${name} etüte katılmamıştır, bilginize sunarız.%0AElit Eğitim Kurumu`;
-  const url = `https://wa.me/${phone.replace(/\+/g,'')}?text=${msg}`;
+  const msg=`Merhabalar Öğrencimiz ${name} etüte katılmamıştır, bilginize sunarız.%0AElit Eğitim Kurumu`;
+  const url=`https://wa.me/${phone.replace(/\+/g,'')}?text=${msg}`;
   window.open(url,"_blank");
 }
 
 function notifyInstitution(){
-  const absents = students.filter(s=>statuses[s.name]==="absent").map(s=>s.name);
+  const absents=students.filter(s=>statuses[s.name]==="absent").map(s=>s.name);
   if(absents.length===0){ alert("Tüm öğrenciler etütte, bildirilecek öğrenci yok."); return; }
-  const message = `Etütte olmayan öğrenciler:\n\n${absents.join(", ")}`;
-  const url = `https://wa.me/${INSTITUTION_PHONE.replace(/\+/g,'')}?text=${encodeURIComponent(message)}`;
+  const message=`Etütte olmayan öğrenciler:\n\n${absents.join(", ")}`;
+  const url=`https://wa.me/${INSTITUTION_PHONE.replace(/\+/g,'')}?text=${encodeURIComponent(message)}`;
   window.open(url,"_blank");
 }
 
-// Panel kontrolleri
-function openPanel(){ document.getElementById("overlay").style.display="block"; document.getElementById("panel").style.display="block"; }
-function closePanel(){ document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none"; }
-function clearInputs(){ document.getElementById("newName").value=""; document.getElementById("newClass").value=""; document.getElementById("newPhone").value=""; }
+function openPanel(){document.getElementById("overlay").style.display="block";document.getElementById("panel").style.display="block";}
+function closePanel(){document.getElementById("overlay").style.display="none";document.getElementById("panel").style.display="none";}
+function clearInputs(){document.getElementById("newName").value="";document.getElementById("newClass").value="";document.getElementById("newPhone").value="";}
 
-// Öğrenci ekle/sil
 async function addStudent(){
   const name=document.getElementById("newName").value.trim();
   const cls=document.getElementById("newClass").value.trim();
   const phone=document.getElementById("newPhone").value.trim();
-  if(!name||!cls){ alert("Lütfen isim ve sınıf girin."); return; }
-  const exists=students.some(s=>s.name.toLowerCase()===name.toLowerCase());
-  if(exists){ alert("Bu isimde öğrenci zaten mevcut."); return; }
-  const newStudent={name,class:cls,phone};
+  if(!name||!cls){alert("Lütfen isim ve sınıf girin.");return;}
+  if(students.some(s=>s.name.toLowerCase()===name.toLowerCase())){alert("Bu isimde öğrenci zaten mevcut.");return;}
+  const newStudent={name,class:cls,phone,status:""};
   await setDoc(doc(db,"students",name),newStudent);
   students.push(newStudent);
   renderClassButtons(); renderStudentsTable(); clearInputs(); closePanel();
@@ -300,50 +243,63 @@ async function addStudent(){
 
 async function removeStudent(){
   const name=document.getElementById("removeName").value.trim();
-  if(!name){ alert("Silinecek öğrencinin adını girin."); return; }
+  if(!name){alert("Silinecek öğrencinin adını girin.");return;}
   const idx=students.findIndex(s=>s.name.toLowerCase()===name.toLowerCase());
-  if(idx===-1){ alert("Bu isimde öğrenci bulunamadı."); return; }
+  if(idx===-1){alert("Bu isimde öğrenci bulunamadı.");return;}
   await deleteDoc(doc(db,"students",students[idx].name));
   students.splice(idx,1);
-  renderClassButtons(); renderStudentsTable(); document.getElementById("removeName").value=""; closePanel();
+  renderClassButtons(); renderStudentsTable();
+  document.getElementById("removeName").value="";
+  closePanel();
 }
 
-// Event listener
-let activeClassFilter=null;
+function renderParentCards(){
+  const container=document.getElementById("parentCards");
+  container.innerHTML="";
+  const searchVal=document.getElementById("parentSearch").value.toLowerCase();
+  students.filter(s=>s.name.toLowerCase().includes(searchVal)).forEach(s=>{
+    const div=document.createElement("div"); div.className="parent-card";
+    const statusDot=document.createElement("span"); statusDot.className="status-dot";
+    if(statuses[s.name]==="present") statusDot.classList.add("status-present");
+    else statusDot.classList.add("status-absent");
+    div.innerHTML=`${s.name} <br/>${s.class}`;
+    div.prepend(statusDot);
+    container.appendChild(div);
+  });
+}
+
 document.addEventListener("DOMContentLoaded",()=>{
-  const teacherBtn=document.getElementById("teacherBtn");
-  const parentBtn=document.getElementById("parentBtn");
-  const passwordPanel=document.getElementById("passwordPanel");
-  const teacherLoginBtn=document.getElementById("teacherLoginBtn");
-  const teacherPassword=document.getElementById("teacherPassword");
   const loginPanel=document.getElementById("loginPanel");
-  const headerEl=document.querySelector("header");
-  const mainEl=document.querySelector("main");
+  const passwordPanel=document.getElementById("passwordPanel");
+  const mainPanel=document.querySelector("main");
+  const header=document.querySelector("header");
 
-  teacherBtn.addEventListener("click",()=>{ passwordPanel.style.display="flex"; });
-  teacherLoginBtn.addEventListener("click",()=>{
-    if(teacherPassword.value==="elit"){
-      isParentMode=false;
-      loginPanel.style.display="none";
-      headerEl.style.display="block";
-      mainEl.style.display="flex";
+  document.getElementById("teacherBtn").addEventListener("click",()=>{
+    loginPanel.style.display="none"; passwordPanel.style.display="flex";
+  });
+
+  document.getElementById("teacherLoginBtn").addEventListener("click",()=>{
+    const pw=document.getElementById("teacherPassword").value;
+    if(pw==="elit"){
+      passwordPanel.style.display="none"; mainPanel.style.display="flex"; header.style.display="block"; isParentMode=false;
       loadStudents();
-    }else{ alert("Şifre yanlış!"); }
+      document.getElementById("btnPanel").addEventListener("click", openPanel);
+      document.getElementById("overlay").addEventListener("click", closePanel);
+      document.getElementById("btnClose").addEventListener("click", closePanel);
+      document.getElementById("btnClear").addEventListener("click", clearInputs);
+      document.getElementById("btnAdd").addEventListener("click", addStudent);
+      document.getElementById("btnRemove").addEventListener("click", removeStudent);
+      document.getElementById("btnNotify").addEventListener("click", notifyInstitution);
+    } else alert("Şifre yanlış!");
   });
 
-  parentBtn.addEventListener("click",()=>{
-    isParentMode=true;
-    loginPanel.style.display="none";
+  document.getElementById("parentBtn").addEventListener("click",()=>{
+    loginPanel.style.display="none"; mainPanel.style.display="flex"; header.style.display="block"; isParentMode=true;
+    document.getElementById("yoklamaPanel").style.display="none";
+    document.getElementById("parentTableWrap").style.display="block";
     loadStudents();
+    document.getElementById("parentSearch").addEventListener("input",renderParentCards);
   });
-
-  document.getElementById("btnPanel").addEventListener("click", openPanel);
-  document.getElementById("overlay").addEventListener("click", closePanel);
-  document.getElementById("btnClose").addEventListener("click", closePanel);
-  document.getElementById("btnClear").addEventListener("click", clearInputs);
-  document.getElementById("btnAdd").addEventListener("click", addStudent);
-  document.getElementById("btnRemove").addEventListener("click", removeStudent);
-  document.getElementById("btnNotify").addEventListener("click", notifyInstitution);
 });
 </script>
 </body>
