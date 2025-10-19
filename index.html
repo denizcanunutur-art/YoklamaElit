@@ -97,7 +97,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const INSTITUTION_PHONE = "+905527112922";
 let isParentMode = false;
 let activeClassFilter = null;
 let students = [];
@@ -112,8 +111,13 @@ async function loadStudents(){
     students.push(data);
     statuses[data.name] = data.status || "";
   });
-  if(isParentMode) renderParentCards();
-  else { renderClassButtons(); renderStudentsTable(); }
+  if(isParentMode){
+    renderParentCards();
+  } else {
+    renderClassButtons();
+    renderStudentsTable();
+    document.getElementById("yoklamaPanel").style.display="block";
+  }
 }
 
 // --- Update status ---
@@ -192,6 +196,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     const pw = document.getElementById("teacherPassword").value;
     if(pw==="elit"){
       passwordPanel.style.display="none"; mainPanel.style.display="block"; isParentMode=false;
+      document.getElementById("yoklamaPanel").style.display="block";
+      document.getElementById("parentTableWrap").style.display="none";
       loadStudents();
     } else alert("Şifre yanlış!");
   });
