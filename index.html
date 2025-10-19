@@ -8,8 +8,6 @@
 :root{--red:#e74c3c;--green:#25d366;--blue:#2d6cdf;--muted:#f7f7f7;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:"Montserrat",Arial,sans-serif;min-height:100vh;background:linear-gradient(135deg,#1c2b5b,#3a5ea0);color:#222;}
-
-/* --- Giriş Paneli --- */
 #loginPanel{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:linear-gradient(135deg,#1c2b5b,#3a5ea0);z-index:100;}
 #loginBox{display:flex;max-width:900px;width:90%;background:rgba(255,255,255,0.95);border-radius:12px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,0.3);flex-direction:row;min-height:400px;}
 #loginLogo{flex:1;display:flex;justify-content:center;align-items:center;background:#fff;}
@@ -25,26 +23,17 @@ body{font-family:"Montserrat",Arial,sans-serif;min-height:100vh;background:linea
 #passwordPanel input{width:80%;padding:10px;margin:10px 0;border-radius:8px;border:1px solid #dcdcdc;font-size:16px;}
 #passwordPanel button{margin-top:10px;padding:10px 18px;font-weight:700;border:none;border-radius:8px;background:var(--blue);color:#fff;cursor:pointer;transition:0.3s;}
 #passwordPanel button:hover{background:#1b4bb8;}
-
-/* --- Ana Panel --- */
-header{background:rgba(255,255,255,0.92);padding:20px 12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:none;}
-header h1{margin:0;font-size:28px;font-weight:800}
-header h1 span{color:var(--red)}
-header h2{margin:6px 0 0 0;font-size:15px;color:#555;font-weight:600}
-main{display:none;padding:18px;justify-content:center;flex-wrap:wrap;gap:18px;}
-
-/* --- Veli modu tabloları --- */
-#parentTableWrap{display:none;max-width:1000px;margin:20px auto;background:rgba(255,255,255,0.95);border-radius:10px;overflow:auto;padding:12px;}
-#parentTableWrap h3{font-size:22px;text-align:center;margin-bottom:12px;}
-#parentTableWrap p{font-size:14px;color:#555;text-align:center;margin-bottom:10px;}
-#parentTable{width:100%;border-collapse:collapse;}
+#parentTableWrap{display:none;max-width:900px;margin:20px auto;background:rgba(255,255,255,0.95);border-radius:10px;padding:12px;}
+#parentTableWrap h3{margin-bottom:12px;font-size:22px;text-align:center;}
+#parentSearch{width:100%;padding:8px;margin:10px 0 12px 0;border-radius:6px;border:1px solid #ccc;font-size:16px;}
 #parentTable th, #parentTable td{text-align:left;padding:12px;border-bottom:1px solid #ddd;font-size:16px;}
 .status-dot{display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:8px;}
 .status-present{background:var(--green);}
 .status-absent{background:var(--red);}
-#parentTable tbody tr:hover{background:none;}
-
-/* --- Öğretmen modu stilleri (mevcut kod) */
+header{background:rgba(255,255,255,0.92);padding:20px 12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:none;}
+header h1{margin:0;font-size:28px;font-weight:800} header h1 span{color:var(--red);}
+header h2{margin:6px 0 0 0;font-size:15px;color:#555;font-weight:600;}
+main{display:none;padding:18px;justify-content:center;flex-wrap:wrap;gap:18px;}
 .panel{background:rgba(255,255,255,0.96);border-radius:10px;padding:14px;box-shadow:0 6px 20px rgba(0,0,0,0.05);flex:1 1 420px;min-width:300px;position:relative;}
 h3{margin:0 0 10px 0;font-size:18px;}
 .table-wrap{max-height:440px;overflow-y:auto;overflow-x:hidden;border-radius:6px;border:1px solid #e6e6e6;background:#fff;}
@@ -69,9 +58,7 @@ td.name{font-weight:700;}
 #panel .panel-inner{background:#fff;padding:18px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.2);}
 .panel-inner input{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #dcdcdc;}
 #classButtons{display:flex;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
-
 @media(max-width:900px){main{flex-direction:column;padding:12px}#loginBox{flex-direction:column;min-height:500px;}}
-
 </style>
 </head>
 <body>
@@ -94,14 +81,16 @@ td.name{font-weight:700;}
   </div>
 </div>
 
-<!-- Veli Modu Tablosu -->
+<!-- Veli Modu -->
 <div id="parentTableWrap">
-  <h3>Öğrenci Yoklama Listesi (Veli Görünümü)</h3>
-  <p>Bu liste yalnızca bilgilendirme amaçlıdır.</p>
-  <table id="parentTable">
-    <thead><tr><th>İsim</th><th>Sınıf</th><th>Durum</th></tr></thead>
-    <tbody></tbody>
-  </table>
+  <h3>Öğrenci Yoklama Listesi</h3>
+  <input type="text" id="parentSearch" placeholder="Öğrenci ara...">
+  <div style="overflow-x:auto;max-height:500px;">
+    <table id="parentTable">
+      <thead><tr><th>İsim</th><th>Sınıf</th><th>Durum</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
 </div>
 
 <!-- Öğretmen Modu -->
@@ -111,10 +100,33 @@ td.name{font-weight:700;}
 </header>
 
 <main>
-  <!-- Mevcut öğretmen panelleri buraya gelecek (senin eski kodun) -->
+  <section class="panel" id="yoklamaPanel">
+    <h3>Etüt Yoklama Listesi</h3>
+    <button class="btn btn-panel" id="btnPanel">Öğrenci Ekle / Çıkar</button>
+    <div id="classButtons"></div>
+    <div class="table-wrap">
+      <table id="studentsTable">
+        <thead><tr><th>İsim</th><th>Sınıf</th><th>Durum</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h3 style="display:flex;align-items:center;justify-content:space-between">
+      Etütte Olmayanlar
+      <button class="btn btn-notify" id="btnNotify">Kurumu Bilgilendir</button>
+    </h3>
+    <div style="height:8px"></div>
+    <div class="table-wrap">
+      <table id="absentTable">
+        <thead><tr><th>İsim</th><th>Sınıf</th><th>WhatsApp</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
 </main>
 
-<!-- Öğrenci ekle/sil paneli -->
 <div id="overlay"></div>
 <div id="panel" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="panel-inner">
@@ -166,40 +178,149 @@ async function loadStudents(){
   if(isParentMode){ renderParentTable(); }else{ renderClassButtons(); renderStudentsTable(); }
 }
 
-// --- Veli tablosu ---
+// --- Veli Tablosu ---
 function renderParentTable(){
   document.getElementById("parentTableWrap").style.display="block";
-  const tbody=document.querySelector("#parentTable tbody");
-  tbody.innerHTML="";
-  students.forEach(s=>{
-    const tr=document.createElement("tr");
-    const tdName=document.createElement("td"); tdName.textContent=s.name;
-    const tdClass=document.createElement("td"); tdClass.textContent=s.class;
-    const tdStatus=document.createElement("td");
-    const dot=document.createElement("span"); dot.className="status-dot "+(statuses[s.name]==="absent"?"status-absent":"status-present");
-    tdStatus.appendChild(dot);
-    tdStatus.appendChild(document.createTextNode(statuses[s.name]==="absent"?"Yok":"Var"));
+  const tbody = document.querySelector("#parentTable tbody");
+  const searchValue = document.getElementById("parentSearch").value.toLowerCase();
+  tbody.innerHTML = "";
+  students
+    .filter(s => s.name.toLowerCase().includes(searchValue))
+    .forEach(s => {
+      const tr = document.createElement("tr");
+      const tdName = document.createElement("td"); tdName.textContent = s.name;
+      const tdClass = document.createElement("td"); tdClass.textContent = s.class;
+      const tdStatus = document.createElement("td");
+      const dot = document.createElement("span");
+      dot.className = "status-dot " + (statuses[s.name]==="absent"?"status-absent":"status-present");
+      tdStatus.appendChild(dot);
+      tdStatus.appendChild(document.createTextNode(statuses[s.name]==="absent"?"Yok":"Var"));
+      tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
+      tbody.appendChild(tr);
+    });
+}
+document.getElementById("parentSearch").addEventListener("input", renderParentTable);
+
+// --- Öğretmen Mod Fonksiyonları ---
+function renderClassButtons(){
+  const container = document.getElementById("classButtons");
+  container.innerHTML = "";
+  const classes = [...new Set(students.map(s=>s.class))].sort();
+  classes.forEach(cls=>{
+    const btn = document.createElement("button");
+    btn.textContent = cls;
+    btn.className = "btn-class";
+    btn.style.color = "var(--blue)";
+    if(activeClassFilter===cls){btn.style.backgroundColor="var(--blue)";btn.style.color="#fff";}
+    btn.addEventListener("click", ()=>{activeClassFilter=(activeClassFilter===cls)?null:cls; renderStudentsTable(); renderClassButtons();});
+    container.appendChild(btn);
+  });
+}
+
+function renderStudentsTable(){
+  const tbody = document.querySelector("#studentsTable tbody");
+  tbody.innerHTML = "";
+  students.filter(s=>!activeClassFilter || s.class===activeClassFilter)
+  .forEach(s=>{
+    const tr = document.createElement("tr");
+    const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
+    const tdClass = document.createElement("td"); tdClass.textContent=s.class;
+    const tdStatus = document.createElement("td"); tdStatus.className="status-cell";
+    const st = statuses[s.name] || "";
+    tdStatus.classList.remove("status-empty","status-absent","status-present");
+    if(!st) tdStatus.classList.add("status-empty");
+    else if(st==="absent") tdStatus.classList.add("status-absent");
+    else if(st==="present") tdStatus.classList.add("status-present");
+    tdStatus.textContent = st ? (st==="absent"?"Yok":"Var") : "-";
+    tdStatus.addEventListener("click", ()=> toggleStatus(s.name));
     tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
+    tbody.appendChild(tr);
+  });
+  renderAbsentTable();
+}
+
+function toggleStatus(name){
+  const cur = statuses[name];
+  if(!cur) statuses[name]="absent";
+  else if(cur==="absent") statuses[name]="present";
+  else delete statuses[name];
+  renderStudentsTable();
+}
+
+function renderAbsentTable(){
+  const tbody = document.querySelector("#absentTable tbody");
+  tbody.innerHTML = "";
+  const absents = students.filter(s=>statuses[s.name]==="absent");
+  absents.forEach(s=>{
+    const tr = document.createElement("tr");
+    const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
+    const tdClass = document.createElement("td"); tdClass.textContent=s.class;
+    const tdBtn = document.createElement("td"); tdBtn.style.textAlign="center";
+    const btn = document.createElement("button"); btn.className="btn btn-wa"; btn.textContent="Gönder";
+    btn.addEventListener("click", ()=> sendIndividualWA(s.phone,s.name));
+    tdBtn.appendChild(btn);
+    tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdBtn);
     tbody.appendChild(tr);
   });
 }
 
-// --- Öğretmen fonksiyonları (eski kodun buraya gelecek) ---
-// renderClassButtons, renderStudentsTable, toggleStatus, addStudent, removeStudent, notifyInstitution, openPanel, closePanel, clearInputs
+// WhatsApp
+function sendIndividualWA(phone,name){
+  const msg = `Merhabalar Öğrencimiz ${name} etüte katılmamıştır, bilginize sunarız.%0AElit Eğitim Kurumu`;
+  const url = `https://wa.me/${phone.replace(/\+/g,'')}?text=${msg}`;
+  window.open(url,"_blank");
+}
 
-// --- Giriş Paneli ---
+function notifyInstitution(){
+  const absents = students.filter(s=>statuses[s.name]==="absent").map(s=>s.name);
+  if(absents.length===0){ alert("Tüm öğrenciler etütte, bildirilecek öğrenci yok."); return; }
+  const message = `Etütte olmayan öğrenciler:\n\n${absents.join(", ")}`;
+  const url = `https://wa.me/${INSTITUTION_PHONE.replace(/\+/g,'')}?text=${encodeURIComponent(message)}`;
+  window.open(url,"_blank");
+}
+
+// Panel kontrolleri
+function openPanel(){ document.getElementById("overlay").style.display="block"; document.getElementById("panel").style.display="block"; }
+function closePanel(){ document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none"; }
+function clearInputs(){ document.getElementById("newName").value=""; document.getElementById("newClass").value=""; document.getElementById("newPhone").value=""; }
+
+// Öğrenci ekle/sil
+async function addStudent(){
+  const name=document.getElementById("newName").value.trim();
+  const cls=document.getElementById("newClass").value.trim();
+  const phone=document.getElementById("newPhone").value.trim();
+  if(!name||!cls){ alert("Lütfen isim ve sınıf girin."); return; }
+  const exists=students.some(s=>s.name.toLowerCase()===name.toLowerCase());
+  if(exists){ alert("Bu isimde öğrenci zaten mevcut."); return; }
+  const newStudent={name,class:cls,phone};
+  await setDoc(doc(db,"students",name),newStudent);
+  students.push(newStudent);
+  renderClassButtons(); renderStudentsTable(); clearInputs(); closePanel();
+}
+
+async function removeStudent(){
+  const name=document.getElementById("removeName").value.trim();
+  if(!name){ alert("Silinecek öğrencinin adını girin."); return; }
+  const idx=students.findIndex(s=>s.name.toLowerCase()===name.toLowerCase());
+  if(idx===-1){ alert("Bu isimde öğrenci bulunamadı."); return; }
+  await deleteDoc(doc(db,"students",students[idx].name));
+  students.splice(idx,1);
+  renderClassButtons(); renderStudentsTable(); document.getElementById("removeName").value=""; closePanel();
+}
+
+// Event listener
+let activeClassFilter=null;
 document.addEventListener("DOMContentLoaded",()=>{
-  const loginPanel=document.getElementById("loginPanel");
-  const passwordPanel=document.getElementById("passwordPanel");
   const teacherBtn=document.getElementById("teacherBtn");
   const parentBtn=document.getElementById("parentBtn");
+  const passwordPanel=document.getElementById("passwordPanel");
   const teacherLoginBtn=document.getElementById("teacherLoginBtn");
   const teacherPassword=document.getElementById("teacherPassword");
+  const loginPanel=document.getElementById("loginPanel");
   const headerEl=document.querySelector("header");
   const mainEl=document.querySelector("main");
 
   teacherBtn.addEventListener("click",()=>{ passwordPanel.style.display="flex"; });
-
   teacherLoginBtn.addEventListener("click",()=>{
     if(teacherPassword.value==="elit"){
       isParentMode=false;
@@ -213,18 +334,16 @@ document.addEventListener("DOMContentLoaded",()=>{
   parentBtn.addEventListener("click",()=>{
     isParentMode=true;
     loginPanel.style.display="none";
-    document.getElementById("parentTableWrap").style.display="block";
     loadStudents();
   });
 
-  // Öğretmen modu eventleri
-  document.getElementById("btnPanel")?.addEventListener("click",()=>{});
-  document.getElementById("overlay")?.addEventListener("click",()=>{});
-  document.getElementById("btnClose")?.addEventListener("click",()=>{});
-  document.getElementById("btnClear")?.addEventListener("click",()=>{});
-  document.getElementById("btnAdd")?.addEventListener("click",()=>{});
-  document.getElementById("btnRemove")?.addEventListener("click",()=>{});
-  document.getElementById("btnNotify")?.addEventListener("click",()=>{});
+  document.getElementById("btnPanel").addEventListener("click", openPanel);
+  document.getElementById("overlay").addEventListener("click", closePanel);
+  document.getElementById("btnClose").addEventListener("click", closePanel);
+  document.getElementById("btnClear").addEventListener("click", clearInputs);
+  document.getElementById("btnAdd").addEventListener("click", addStudent);
+  document.getElementById("btnRemove").addEventListener("click", removeStudent);
+  document.getElementById("btnNotify").addEventListener("click", notifyInstitution);
 });
 </script>
 </body>
