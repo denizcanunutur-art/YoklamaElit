@@ -6,63 +6,58 @@
 <title>Elit Eğitim Kurumu - Yoklama Sistemi</title>
 <style>
 :root{--red:#e74c3c;--blue:#2d6cdf;--green:#25d366;--muted:#f7f7f7;--gray:#bdbdbd;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:"Montserrat",Arial,sans-serif;color:#222;}
-.hidden{display:none;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Montserrat",Arial,sans-serif;}
+body{background:url('IMG_4035.JPG') center/cover no-repeat;color:#222;}
+h1,h2,h3{margin:0;}
+h1{font-size:28px;font-weight:800;}
+h1 span{color:var(--red);}
+h2{font-size:15px;color:#555;font-weight:600;}
+h3{font-size:18px;margin-bottom:10px;}
+.btn{padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700;display:inline-block;}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-danger{background:#ff6b6b;color:#fff;}
+.btn-wa{background:var(--green);color:#fff;}
+.btn-notify{background:#4a69bd;color:#fff;margin-left:10px;}
+.btn-class{background:#eee;color:var(--blue);margin:2px;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:700;}
+.panel{background:rgba(255,255,255,0.96);border-radius:10px;padding:14px;box-shadow:0 6px 20px rgba(0,0,0,0.05);flex:1 1 420px;min-width:300px;position:relative;}
+.table-wrap{max-height:440px;overflow-y:auto;overflow-x:hidden;border-radius:6px;border:1px solid #e6e6e6;background:#fff;}
+table{width:100%;border-collapse:collapse;min-width:300px;}
+thead th{position:sticky;top:0;background:var(--muted);border-bottom:1px solid #e6e6e6;padding:10px;font-weight:700;text-align:left;}
+tbody td{padding:10px;border-bottom:1px solid #f0f0f0;text-align:left;}
+tbody tr:hover{background:rgba(0,0,0,0.03);}
+.status-cell{width:110px;text-align:center;cursor:pointer;border-radius:6px;padding:6px;font-weight:700;}
+.status-empty{background:transparent;color:#333;}
+.status-absent{background:#ffd8d8;color:#800;}
+.status-present{background:#d6ffd9;color:#064;}
 /* Giriş ekranı */
-#loginScreen{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;background:url('IMG_4035.JPG') center/cover no-repeat;}
-#loginScreen img{width:180px;margin-bottom:40px;}
-#loginScreen button{padding:12px 24px;margin:8px;font-size:18px;font-weight:700;border:none;border-radius:8px;cursor:pointer;}
-#loginScreen button.teacher{background:var(--blue);color:#fff;}
-#loginScreen button.parent{background:var(--green);color:#fff;}
-
-/* Veli görünümü */
-#parentPanel{display:none;padding:20px;}
-#parentPanel input{width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:1px solid #ccc;}
-#parentPanel .table-wrap{max-height:440px;overflow-y:auto;border-radius:6px;border:1px solid #e6e6e6;background:#fff;}
-#parentPanel table{width:100%;border-collapse:collapse;}
-#parentPanel th, #parentPanel td{padding:10px;text-align:left;border-bottom:1px solid #f0f0f0;}
-.status-light{width:14px;height:14px;border-radius:50%;display:inline-block;margin-left:8px;}
+#loginScreen{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;}
+#loginBox{background:#fff;padding:30px;border-radius:12px;text-align:center;max-width:320px;width:90%;box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+#loginBox img{max-width:140px;margin-bottom:20px;}
+#loginBox input{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #dcdcdc;}
+#searchInput{width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #ccc;}
+.status-light{display:inline-block;width:12px;height:12px;border-radius:50%;margin-left:6px;}
+.green{background:green;}
+.red{background:red;}
+@media(max-width:900px){.table-wrap{max-height:300px;}}
 </style>
 </head>
 <body>
 
-<!-- Giriş Ekranı -->
 <div id="loginScreen">
-  <img src="logo.png" alt="Elit Logo">
-  <button class="teacher" id="teacherBtn">Öğretmen Girişi</button>
-  <button class="parent" id="parentBtn">Veli Girişi</button>
-</div>
-
-<!-- Şifre paneli -->
-<div id="teacherLogin" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;">
-  <div style="background:#fff;padding:20px;border-radius:10px;width:300px;text-align:center;">
-    <h3>Öğretmen Girişi</h3>
-    <input type="password" id="teacherPass" placeholder="Şifreyi girin">
-    <button id="loginTeacherBtn" style="margin-top:10px;padding:8px 12px;background:var(--blue);color:#fff;border:none;border-radius:6px;">Giriş</button>
+  <div id="loginBox">
+    <img src="LOGO.png" alt="Elit Logo">
+    <h2>Elit Eğitim Kurumu</h2>
+    <div style="margin:10px 0;"><button class="btn btn-primary" id="teacherBtn">Öğretmen Girişi</button></div>
+    <div><button class="btn btn-primary" id="parentBtn">Veli Girişi</button></div>
   </div>
 </div>
 
-<!-- Veli paneli -->
-<div id="parentPanel">
-  <h2>Öğrenci Yoklama Listesi</h2>
-  <input type="text" id="searchStudent" placeholder="Öğrenci ara...">
-  <div class="table-wrap">
-    <table id="parentTable">
-      <thead><tr><th>İsim</th><th>Sınıf</th><th>Durum</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- Öğretmen paneli -->
-<div id="teacherPanel" class="hidden">
-<!-- Buraya senin attığın orijinal kodun <body> içeriği gelecek, değiştirmeden -->
-<header>
+<header id="mainHeader" style="display:none;">
   <h1><span>Elit</span> Eğitim Kurumu</h1>
-  <h2>Yoklama Alma Sistemi</h2>
+  <h2 id="subHeader">Yoklama Alma Sistemi</h2>
 </header>
-<main>
+
+<main id="teacherPanel" style="display:none;flex-wrap:wrap;gap:18px;padding:18px;justify-content:center;">
   <section class="panel" id="yoklamaPanel">
     <h3>Etüt Yoklama Listesi</h3>
     <button class="btn btn-panel" id="btnPanel">Öğrenci Ekle / Çıkar</button>
@@ -92,6 +87,16 @@ body{font-family:"Montserrat",Arial,sans-serif;color:#222;}
   </section>
 </main>
 
+<main id="parentPanel" style="display:none;padding:18px;">
+  <input id="searchInput" type="text" placeholder="Öğrenci Ara">
+  <div class="table-wrap">
+    <table id="parentTable">
+      <thead><tr><th>İsim</th><th>Sınıf</th><th>Durum</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</main>
+
 <div id="overlay"></div>
 <div id="panel" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="panel-inner">
@@ -112,10 +117,9 @@ body{font-family:"Montserrat",Arial,sans-serif;color:#222;}
     </div>
   </div>
 </div>
-</div>
 
 <script type="module">
-// Firebase ve senin attığın script burada olacak, değiştirmeden
+// Firebase import
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
@@ -136,68 +140,183 @@ let activeClassFilter = null;
 let students = [];
 let statuses = {};
 
-async function loadStudents() {
+// --- DOM Elements ---
+const loginScreen = document.getElementById("loginScreen");
+const teacherPanel = document.getElementById("teacherPanel");
+const parentPanel = document.getElementById("parentPanel");
+const searchInput = document.getElementById("searchInput");
+const parentTableBody = document.querySelector("#parentTable tbody");
+
+// --- Giriş ekranı ---
+document.getElementById("teacherBtn").addEventListener("click", ()=>{
+  const pw = prompt("Öğretmen şifresini girin:");
+  if(pw==="elit"){ 
+    loginScreen.style.display="none"; 
+    teacherPanel.style.display="flex"; 
+    document.getElementById("mainHeader").style.display="block";
+    loadStudents();
+  } else alert("Şifre yanlış!");
+});
+
+document.getElementById("parentBtn").addEventListener("click", ()=>{
+  loginScreen.style.display="none"; 
+  parentPanel.style.display="block"; 
+  document.getElementById("mainHeader").style.display="block";
+  loadParentTable();
+});
+
+// --- Öğrenci listesi ---
+async function loadStudents(){
   students = [];
   const querySnapshot = await getDocs(collection(db, "students"));
-  querySnapshot.forEach((docSnap)=>{students.push({...docSnap.data()});});
+  querySnapshot.forEach(docSnap=>{students.push({...docSnap.data()});});
   renderClassButtons();
   renderStudentsTable();
-  renderParentTable(); // veli panel için
+  renderAbsentTable();
 }
 
-// --- Öğrenci listesi render ---
-function renderParentTable(){
-  const tbody=document.querySelector("#parentTable tbody");
-  if(!tbody) return;
-  tbody.innerHTML="";
-  const search=document.getElementById("searchStudent").value.toLowerCase();
-  students.forEach(s=>{
-    if(s.name.toLowerCase().includes(search)){
-      const tr=document.createElement("tr");
-      const tdName=document.createElement("td"); tdName.textContent=s.name;
-      const tdClass=document.createElement("td"); tdClass.textContent=s.class;
-      const tdStatus=document.createElement("td");
-      const light=document.createElement("span");
-      light.className="status-light";
-      light.style.backgroundColor = (statuses[s.name]==="absent")?"red":"green";
-      tdStatus.appendChild(light);
-      tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
-      tbody.appendChild(tr);
-    }
+function renderClassButtons(){
+  const container = document.getElementById("classButtons");
+  container.innerHTML = "";
+  const classes = [...new Set(students.map(s=>s.class))].sort();
+  classes.forEach(cls=>{
+    const btn = document.createElement("button");
+    btn.textContent=cls;
+    btn.className="btn-class";
+    btn.style.color="var(--blue)";
+    if(activeClassFilter===cls){btn.style.backgroundColor="var(--blue)";btn.style.color="#fff";}
+    btn.addEventListener("click", ()=>{
+      activeClassFilter = (activeClassFilter===cls)?null:cls;
+      renderStudentsTable();
+      renderClassButtons();
+    });
+    container.appendChild(btn);
   });
 }
+
+function renderStudentsTable(){
+  const tbody = document.querySelector("#studentsTable tbody");
+  tbody.innerHTML = "";
+  students.filter(s=>!activeClassFilter || s.class===activeClassFilter)
+  .forEach(s=>{
+    const tr=document.createElement("tr");
+    const tdName=document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
+    const tdClass=document.createElement("td"); tdClass.textContent=s.class;
+    const tdStatus=document.createElement("td"); tdStatus.className="status-cell";
+    const st=statuses[s.name]||"";
+    tdStatus.classList.remove("status-empty","status-absent","status-present");
+    if(!st) tdStatus.classList.add("status-empty");
+    else if(st==="absent") tdStatus.classList.add("status-absent");
+    else if(st==="present") tdStatus.classList.add("status-present");
+    tdStatus.textContent=st ? (st==="absent"?"Yok":"Var") : "-";
+    tdStatus.addEventListener("click", ()=> toggleStatus(s.name));
+    tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
+    tbody.appendChild(tr);
+  });
+}
+
+function toggleStatus(name){
+  const cur=statuses[name];
+  if(!cur) statuses[name]="absent";
+  else if(cur==="absent") statuses[name]="present";
+  else delete statuses[name];
+  renderStudentsTable();
+  renderAbsentTable();
+}
+
+function renderAbsentTable(){
+  const tbody=document.querySelector("#absentTable tbody");
+  tbody.innerHTML="";
+  students.filter(s=>statuses[s.name]==="absent").forEach(s=>{
+    const tr=document.createElement("tr");
+    const tdName=document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
+    const tdClass=document.createElement("td"); tdClass.textContent=s.class;
+    const tdBtn=document.createElement("td"); tdBtn.style.textAlign="center";
+    const btn=document.createElement("button"); btn.className="btn btn-wa"; btn.textContent="Gönder";
+    btn.addEventListener("click", ()=> sendIndividualWA(s.phone,s.name));
+    tdBtn.appendChild(btn); tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdBtn);
+    tbody.appendChild(tr);
+  });
+}
+
+// --- WhatsApp ---
+function sendIndividualWA(phone,name){
+  const msg=`Merhabalar Öğrencimiz ${name} etüte katılmamıştır, bilginize sunarız.%0AElit Eğitim Kurumu`;
+  const url=`https://wa.me/${phone.replace(/\+/g,'')}?text=${msg}`;
+  window.open(url,"_blank");
+}
+
+function notifyInstitution(){
+  const absents = students.filter(s=>statuses[s.name]==="absent").map(s=>s.name);
+  if(absents.length===0){ alert("Tüm öğrenciler etütte, bildirilecek öğrenci yok."); return; }
+  const message=`Etütte olmayan öğrenciler:\n\n${absents.join(", ")}`;
+  const url=`https://wa.me/${INSTITUTION_PHONE.replace(/\+/g,'')}?text=${encodeURIComponent(message)}`;
+  window.open(url,"_blank");
+}
+
+// --- Panel ---
+function openPanel(){document.getElementById("overlay").style.display="block"; document.getElementById("panel").style.display="block";}
+function closePanel(){document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none";}
+function clearInputs(){document.getElementById("newName").value=""; document.getElementById("newClass").value=""; document.getElementById("newPhone").value="";}
+
+// --- Öğrenci ekle/sil ---
+async function addStudent(){
+  const name=document.getElementById("newName").value.trim();
+  const cls=document.getElementById("newClass").value.trim();
+  const phone=document.getElementById("newPhone").value.trim();
+  if(!name||!cls){alert("Lütfen isim ve sınıf girin."); return;}
+  if(students.some(s=>s.name.toLowerCase()===name.toLowerCase())){alert("Bu isimde öğrenci zaten mevcut."); return;}
+  const newStudent={name,class:cls,phone};
+  await setDoc(doc(db,"students",name),newStudent);
+  students.push(newStudent);
+  renderClassButtons(); renderStudentsTable(); clearInputs(); closePanel();
+}
+
+async function removeStudent(){
+  const name=document.getElementById("removeName").value.trim();
+  if(!name){alert("Silinecek öğrencinin adını girin."); return;}
+  const idx=students.findIndex(s=>s.name.toLowerCase()===name.toLowerCase());
+  if(idx===-1){alert("Bu isimde öğrenci bulunamadı."); return;}
+  await deleteDoc(doc(db,"students",students[idx].name));
+  students.splice(idx,1);
+  renderClassButtons(); renderStudentsTable();
+  document.getElementById("removeName").value="";
+  closePanel();
+}
+
+// --- Parent panel ---
+function loadParentTable(){
+  parentTableBody.innerHTML="";
+  students.forEach(s=>{
+    const tr=document.createElement("tr");
+    const tdName=document.createElement("td"); tdName.textContent=s.name;
+    const tdClass=document.createElement("td"); tdClass.textContent=s.class;
+    const tdStatus=document.createElement("td"); 
+    const status=statuses[s.name]||"absent";
+    tdStatus.innerHTML=`<span class="status-light ${status==="present"?"green":"red"}"></span>`;
+    tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
+    parentTableBody.appendChild(tr);
+  });
+}
+
+searchInput.addEventListener("input", ()=>{
+  const filter = searchInput.value.toLowerCase();
+  Array.from(parentTableBody.querySelectorAll("tr")).forEach(tr=>{
+    const name = tr.querySelector("td").textContent.toLowerCase();
+    tr.style.display = name.includes(filter) ? "" : "none";
+  });
+});
 
 // --- Event listener ---
-document.addEventListener("DOMContentLoaded",()=>{
-  const loginScreen=document.getElementById("loginScreen");
-  const teacherLogin=document.getElementById("teacherLogin");
-  const teacherPanel=document.getElementById("teacherPanel");
-  const parentPanel=document.getElementById("parentPanel");
-  const teacherBtn=document.getElementById("teacherBtn");
-  const parentBtn=document.getElementById("parentBtn");
-  const loginTeacherBtn=document.getElementById("loginTeacherBtn");
-  const teacherPass=document.getElementById("teacherPass");
-  const searchInput=document.getElementById("searchStudent");
-
-  teacherBtn.addEventListener("click",()=>teacherLogin.classList.remove("hidden"));
-  parentBtn.addEventListener("click",()=>{
-    loginScreen.classList.add("hidden");
-    parentPanel.style.display="block";
-    loadStudents();
-  });
-
-  loginTeacherBtn.addEventListener("click",()=>{
-    if(teacherPass.value==="elit"){
-      teacherLogin.classList.add("hidden");
-      loginScreen.classList.add("hidden");
-      teacherPanel.classList.remove("hidden");
-      loadStudents();
-    }else{alert("Yanlış şifre!");}
-  });
-
-  searchInput.addEventListener("input",renderParentTable);
+document.addEventListener("DOMContentLoaded", ()=>{
+  document.getElementById("btnPanel").addEventListener("click", openPanel);
+  document.getElementById("overlay").addEventListener("click", closePanel);
+  document.getElementById("btnClose").addEventListener("click", closePanel);
+  document.getElementById("btnClear").addEventListener("click", clearInputs);
+  document.getElementById("btnAdd").addEventListener("click", addStudent);
+  document.getElementById("btnRemove").addEventListener("click", removeStudent);
+  document.getElementById("btnNotify").addEventListener("click", notifyInstitution);
 });
 </script>
-
 </body>
 </html>
