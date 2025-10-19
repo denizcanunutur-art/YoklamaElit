@@ -104,6 +104,7 @@ tbody tr:hover{background:rgba(0,0,0,0.03);}
 </div>
 
 <script type="module">
+// Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
@@ -119,32 +120,28 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let isParentMode = false;
-let activeClassFilter = null;
 let students = [];
 let statuses = {};
+let activeClassFilter = null;
+let isParentMode = false;
 
+// --- Öğrencileri yükleme ---
 async function loadStudents(){
-  students=[];
-  const querySnapshot = await getDocs(collection(db,"students"));
-  querySnapshot.forEach(docSnap=>{
-    const data = docSnap.data();
-    students.push(data);
-    statuses[data.name] = data.status || "";
-  });
-  if(isParentMode) renderParentCards();
-  else { document.querySelector("main").style.display="block"; document.getElementById("yoklamaPanel").style.display="block"; renderClassButtons(); renderStudentsTable(); }
+  students = [];
+  const query = await getDocs(collection(db,"students"));
+  query.forEach(d=>{students.push(d.data()); statuses[d.data().name]=d.data().status||"";});
+  if(isParentMode){ document.getElementById("parentTableWrap").style.display="block"; renderParentCards();}
+  else{ document.querySelector("main").style.display="block"; document.getElementById("yoklamaPanel").style.display="block"; renderClassButtons(); renderStudentsTable();}
 }
 
+// --- Render ---
 function renderClassButtons(){
-  const container = document.getElementById("classButtons");
-  container.innerHTML="";
+  const container = document.getElementById("classButtons"); container.innerHTML="";
   const classes = [...new Set(students.map(s=>s.class))].sort();
   classes.forEach(cls=>{
-    const btn=document.createElement("button");
-    btn.textContent=cls; btn.className="btn-class"; btn.style.color="#2d6cdf";
-    if(activeClassFilter===cls){btn.style.backgroundColor="#2d6cdf";btn.style.color="#fff";}
-    btn.addEventListener("click",()=>{activeClassFilter=(activeClassFilter===cls)?null:cls; renderStudentsTable(); renderClassButtons();});
+    const btn=document.createElement("button"); btn.textContent=cls; btn.className="btn-class";
+    if(activeClassFilter===cls){btn.style.backgroundColor="#2d6cdf"; btn.style.color="#fff";}
+    btn.addEventListener("click",()=>{activeClassFilter=(activeClassFilter===cls)?null:cls; renderClassButtons(); renderStudentsTable();});
     container.appendChild(btn);
   });
 }
@@ -156,84 +153,96 @@ function renderStudentsTable(){
     const tdName=document.createElement("td"); tdName.textContent=s.name; tdName.className="name";
     const tdClass=document.createElement("td"); tdClass.textContent=s.class;
     const tdStatus=document.createElement("td"); tdStatus.className="status-cell";
-    const st=statuses[s.name]||""; tdStatus.classList.remove("status-empty","status-present","status-absent");
+    const st=statuses[s.name]||"";
+    tdStatus.classList.remove("status-empty","status-present","status-absent");
     if(!st) tdStatus.classList.add("status-empty");
-    else if(st==="absent") tdStatus.classList.add("status-absent");
-    else tdStatus.classList.add("status-present");
-    tdStatus.textContent = st? (st==="absent"?"Yok":"Var") : "-";
+    else if(st==="present") tdStatus.classList.add("status-present");
+    else tdStatus.classList.add("status-absent");
+    tdStatus.textContent=st? (st==="present"?"Var":"Yok") : "-";
     tdStatus.addEventListener("click",()=>{ toggleStatus(s.name); });
-    tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus); tbody.appendChild(tr);
+    tr.append(tdName,tdClass,tdStatus); tbody.appendChild(tr);
   });
 }
 
-async function toggleStatus(name){
+function toggleStatus(name){
   if(!statuses[name]) statuses[name]="absent";
   else if(statuses[name]==="absent") statuses[name]="present";
   else statuses[name]="";
-  await updateDoc(doc(db,"students",name), {status: statuses[name]});
+  updateStatusFirebase(name,statuses[name]);
   renderStudentsTable();
 }
 
+async function updateStatusFirebase(name,status){
+  const docRef=doc(db,"students",name);
+  await updateDoc(docRef,{status});
+}
+
 function renderParentCards(){
+  const searchText=document.getElementById("parentSearch").value.toLowerCase();
   const container=document.getElementById("parentCards"); container.innerHTML="";
-  const filterText=document.getElementById("parentSearch").value.toLowerCase();
-  students.filter(s=>s.name.toLowerCase().includes(filterText)).forEach(s=>{
-    const div=document.createElement("div"); div.className="parent-card";
-    const dot=document.createElement("span"); dot.className="status-dot"; dot.classList.add(statuses[s.name]==="present"?"status-present-dot":"status-absent-dot");
-    const nameEl=document.createElement("div"); nameEl.textContent=s.name;
-    const classEl=document.createElement("div"); classEl.textContent=s.class;
-    div.appendChild(dot); div.appendChild(nameEl); div.appendChild(classEl); container.appendChild(div);
+  students.filter(s=>s.name.toLowerCase().includes(searchText)).forEach(s=>{
+    const card=document.createElement("div"); card.className="parent-card";
+    const dot=document.createElement("span"); dot.className="status-dot";
+    dot.classList.add(s.status==="present"?"status-present-dot":"status-absent-dot");
+    card.appendChild(dot);
+    const name=document.createElement("span"); name.textContent=`${s.name} (${s.class})`; card.appendChild(name);
+    container.appendChild(card);
   });
 }
 
-document.addEventListener("DOMContentLoaded",()=>{
-  const loginPanel=document.getElementById("loginPanel");
-  const teacherBtn=document.getElementById("teacherBtn");
-  const parentBtn=document.getElementById("parentBtn");
-  const passwordPanel=document.getElementById("passwordPanel");
-  const teacherLoginBtn=document.getElementById("teacherLoginBtn");
-  const teacherPassword=document.getElementById("teacherPassword");
+// --- Giriş ---
+const teacherBtn=document.getElementById("teacherBtn");
+const parentBtn=document.getElementById("parentBtn");
+const passwordPanel=document.getElementById("passwordPanel");
+const teacherPassword=document.getElementById("teacherPassword");
+const teacherLoginBtn=document.getElementById("teacherLoginBtn");
 
-  teacherBtn.addEventListener("click",()=>{ passwordPanel.style.display="flex"; });
-  parentBtn.addEventListener("click",()=>{
-    isParentMode=true; loginPanel.style.display="none"; document.querySelector("main").style.display="block";
-    document.getElementById("parentTableWrap").style.display="block"; loadStudents();
-  });
-
-  teacherLoginBtn.addEventListener("click",()=>{
-    if(teacherPassword.value==="elit"){ loginPanel.style.display="none"; document.querySelector("main").style.display="block"; loadStudents(); }
-    else alert("Şifre yanlış!");
-  });
-
-  document.getElementById("parentSearch").addEventListener("input",()=>{ renderParentCards(); });
-
-  // Panel kontrolleri
-  document.getElementById("btnPanel").addEventListener("click",()=>{ document.getElementById("overlay").style.display="block"; document.getElementById("panel").style.display="block"; });
-  document.getElementById("overlay").addEventListener("click",()=>{ document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none"; });
-  document.getElementById("btnClose").addEventListener("click",()=>{ document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none"; });
-  document.getElementById("btnClear").addEventListener("click",()=>{ document.getElementById("newName").value=""; document.getElementById("newClass").value=""; document.getElementById("newPhone").value=""; });
-  document.getElementById("btnAdd").addEventListener("click", async ()=>{
-    const name=document.getElementById("newName").value.trim();
-    const cls=document.getElementById("newClass").value.trim();
-    const phone=document.getElementById("newPhone").value.trim();
-    if(!name||!cls){ alert("İsim ve sınıf girin"); return; }
-    if(students.some(s=>s.name.toLowerCase()===name.toLowerCase())){ alert("Bu isim zaten mevcut"); return; }
-    const newStudent={name,class:cls,phone,status:""};
-    await setDoc(doc(db,"students",name),newStudent);
-    students.push(newStudent);
-    renderClassButtons(); renderStudentsTable();
-    document.getElementById("newName").value=""; document.getElementById("newClass").value=""; document.getElementById("newPhone").value=""; document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none";
-  });
-  document.getElementById("btnRemove").addEventListener("click", async ()=>{
-    const name=document.getElementById("removeName").value.trim();
-    if(!name){ alert("İsim girin"); return; }
-    const idx=students.findIndex(s=>s.name.toLowerCase()===name.toLowerCase());
-    if(idx===-1){ alert("Öğrenci bulunamadı"); return; }
-    await deleteDoc(doc(db,"students",students[idx].name));
-    students.splice(idx,1); renderClassButtons(); renderStudentsTable();
-    document.getElementById("removeName").value=""; document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none";
-  });
+teacherBtn.addEventListener("click",()=>{passwordPanel.style.display="flex";});
+parentBtn.addEventListener("click",()=>{
+  isParentMode=true;
+  document.getElementById("loginPanel").style.display="none";
+  document.querySelector("main").style.display="block";
+  loadStudents();
 });
+
+teacherLoginBtn.addEventListener("click",()=>{
+  if(teacherPassword.value==="elit"){ document.getElementById("loginPanel").style.display="none"; isParentMode=false; loadStudents();}
+  else alert("Şifre yanlış!");
+});
+
+// --- Panel kontrolleri ---
+document.getElementById("btnPanel").addEventListener("click",()=>{ document.getElementById("overlay").style.display="block"; document.getElementById("panel").style.display="block"; });
+document.getElementById("overlay").addEventListener("click",()=>{ document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none"; });
+document.getElementById("btnClose").addEventListener("click",()=>{ document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none"; });
+document.getElementById("btnClear").addEventListener("click",()=>{ document.getElementById("newName").value=""; document.getElementById("newClass").value=""; document.getElementById("newPhone").value=""; });
+
+// --- Öğrenci ekle/sil ---
+document.getElementById("btnAdd").addEventListener("click", async ()=>{
+  const name=document.getElementById("newName").value.trim();
+  const cls=document.getElementById("newClass").value.trim();
+  const phone=document.getElementById("newPhone").value.trim();
+  if(!name||!cls){ alert("İsim ve sınıf girin."); return; }
+  if(students.some(s=>s.name.toLowerCase()===name.toLowerCase())){ alert("Bu isim zaten mevcut."); return; }
+  const newStudent={name,class:cls,phone,status:""};
+  await setDoc(doc(db,"students",name),newStudent);
+  students.push(newStudent);
+  renderClassButtons(); renderStudentsTable();
+  document.getElementById("newName").value=""; document.getElementById("newClass").value=""; document.getElementById("newPhone").value="";
+  document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none";
+});
+
+document.getElementById("btnRemove").addEventListener("click", async ()=>{
+  const name=document.getElementById("removeName").value.trim();
+  if(!name){ alert("Silinecek öğrenci adı girin."); return; }
+  const idx=students.findIndex(s=>s.name.toLowerCase()===name.toLowerCase());
+  if(idx===-1){ alert("Öğrenci bulunamadı."); return; }
+  await deleteDoc(doc(db,"students",students[idx].name));
+  students.splice(idx,1);
+  renderClassButtons(); renderStudentsTable();
+  document.getElementById("removeName").value="";
+  document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none";
+});
+
 </script>
 </body>
 </html>
