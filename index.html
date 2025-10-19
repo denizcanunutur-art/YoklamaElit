@@ -40,6 +40,10 @@ tbody tr:hover{background:rgba(0,0,0,0.03);}
 .parent-search{margin-bottom:12px;padding:8px;width:100%;border-radius:8px;border:1px solid #dcdcdc;font-size:16px;}
 #classButtons{display:flex;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
 .btn-class{background:#eee;color:var(--blue);margin:2px;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:700;}
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:40}
+#panel{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;width:92%;max-width:520px}
+#panel .panel-inner{background:#fff;padding:18px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.2)}
+.panel-inner input{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #dcdcdc}
 @media(max-width:500px){#loginPanel{padding:30px 20px;} .btn{font-size:14px;padding:10px 0;}}
 </style>
 </head>
@@ -60,6 +64,7 @@ tbody tr:hover{background:rgba(0,0,0,0.03);}
 </div>
 
 <main>
+  <!-- Öğretmen yoklama paneli -->
   <section class="panel" id="yoklamaPanel">
     <h3>Etüt Yoklama Listesi</h3>
     <button class="btn btn-primary" id="btnPanel">Öğrenci Ekle / Çıkar</button>
@@ -72,11 +77,34 @@ tbody tr:hover{background:rgba(0,0,0,0.03);}
     </div>
   </section>
 
+  <!-- Veli paneli -->
   <section class="panel" id="parentTableWrap">
     <input type="text" id="parentSearch" class="parent-search" placeholder="Öğrenci ara..."/>
     <div class="parent-cards" id="parentCards"></div>
   </section>
 </main>
+
+<!-- Öğrenci ekleme paneli (değişmedi) -->
+<div id="overlay"></div>
+<div id="panel" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="panel-inner">
+    <h3>Öğrenci Yönetimi</h3>
+    <input id="newName" type="text" placeholder="Ad Soyad" />
+    <input id="newClass" type="text" placeholder="Sınıf (örn: 11Say)" />
+    <input id="newPhone" type="text" placeholder="Telefon (örn +90...)" />
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-primary" id="btnAdd">Ekle</button>
+      <button class="btn" id="btnClear">Temizle</button>
+    </div>
+    <hr style="margin:12px 0">
+    <div style="font-weight:700;margin-bottom:6px">Öğrenci Sil</div>
+    <input id="removeName" type="text" placeholder="Silinecek öğrenci adı" />
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-danger" id="btnRemove">Sil</button>
+      <button class="btn" id="btnClose">Kapat</button>
+    </div>
+  </div>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
@@ -99,6 +127,7 @@ let activeClassFilter = null;
 let students = [];
 let statuses = {};
 
+// --- Öğrenci yükleme ---
 async function loadStudents(){
   students = [];
   const querySnapshot = await getDocs(collection(db,"students"));
@@ -107,15 +136,11 @@ async function loadStudents(){
     students.push(data);
     statuses[data.name] = data.status || "";
   });
-  if(isParentMode){
-    renderParentCards();
-  } else {
-    renderClassButtons();
-    renderStudentsTable();
-    document.getElementById("yoklamaPanel").style.display="block";
-  }
+  if(isParentMode) renderParentCards();
+  else { renderClassButtons(); renderStudentsTable(); document.getElementById("yoklamaPanel").style.display="block";}
 }
 
+// --- Durum güncelleme ---
 async function updateStatus(name,newStatus){
   statuses[name] = newStatus;
   const studentRef = doc(db,"students",name);
@@ -124,6 +149,7 @@ async function updateStatus(name,newStatus){
   else renderStudentsTable();
 }
 
+// --- Render ---
 function renderClassButtons(){
   const container = document.getElementById("classButtons"); container.innerHTML="";
   const classes = [...new Set(students.map(s=>s.class))].sort();
@@ -131,10 +157,7 @@ function renderClassButtons(){
     const btn = document.createElement("button");
     btn.textContent = cls; btn.className="btn-class";
     if(activeClassFilter===cls){btn.style.backgroundColor="var(--blue)";btn.style.color="#fff";}
-    btn.addEventListener("click",()=>{
-      activeClassFilter = (activeClassFilter===cls)?null:cls;
-      renderStudentsTable(); renderClassButtons();
-    });
+    btn.addEventListener("click",()=>{ activeClassFilter = (activeClassFilter===cls)?null:cls; renderStudentsTable(); renderClassButtons(); });
     container.appendChild(btn);
   });
 }
@@ -165,6 +188,7 @@ function toggleStatus(name){
   else updateStatus(name,"");
 }
 
+// --- Veli kartları ---
 function renderParentCards(){
   const container = document.getElementById("parentCards"); container.innerHTML="";
   const searchVal = document.getElementById("parentSearch").value.toLowerCase();
@@ -178,23 +202,18 @@ function renderParentCards(){
   });
 }
 
+// --- Event listener ---
 document.addEventListener("DOMContentLoaded",()=>{
   const loginPanel = document.getElementById("loginPanel");
   const passwordPanel = document.getElementById("passwordPanel");
   const mainPanel = document.querySelector("main");
 
-  document.getElementById("teacherBtn").addEventListener("click",()=>{
-    passwordPanel.style.display="flex"; 
-    passwordPanel.style.flexDirection="column";
-    passwordPanel.style.alignItems="center";
-  });
+  document.getElementById("teacherBtn").addEventListener("click",()=>{ passwordPanel.style.display="flex"; passwordPanel.style.flexDirection="column"; passwordPanel.style.alignItems="center"; });
 
   document.getElementById("teacherLoginBtn").addEventListener("click", async ()=>{
     const pw = document.getElementById("teacherPassword").value;
     if(pw==="elit"){
-      loginPanel.style.display="none"; 
-      mainPanel.style.display="block"; 
-      isParentMode=false;
+      loginPanel.style.display="none"; mainPanel.style.display="block"; isParentMode=false;
       document.getElementById("yoklamaPanel").style.display="block";
       document.getElementById("parentTableWrap").style.display="none";
       await loadStudents();
@@ -202,13 +221,39 @@ document.addEventListener("DOMContentLoaded",()=>{
   });
 
   document.getElementById("parentBtn").addEventListener("click",()=>{
-    loginPanel.style.display="none"; 
-    mainPanel.style.display="block"; 
-    isParentMode=true;
+    loginPanel.style.display="none"; mainPanel.style.display="block"; isParentMode=true;
     document.getElementById("yoklamaPanel").style.display="none";
     document.getElementById("parentTableWrap").style.display="block";
     loadStudents();
     document.getElementById("parentSearch").addEventListener("input",renderParentCards);
+  });
+
+  // Öğrenci yönetim paneli
+  document.getElementById("btnPanel").addEventListener("click",()=>{ document.getElementById("overlay").style.display="block"; document.getElementById("panel").style.display="block"; });
+  document.getElementById("overlay").addEventListener("click",()=>{ document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none"; });
+  document.getElementById("btnClose").addEventListener("click",()=>{ document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none"; });
+  document.getElementById("btnClear").addEventListener("click",()=>{ document.getElementById("newName").value=""; document.getElementById("newClass").value=""; document.getElementById("newPhone").value=""; });
+  document.getElementById("btnAdd").addEventListener("click",async ()=>{
+    const name = document.getElementById("newName").value.trim();
+    const cls = document.getElementById("newClass").value.trim();
+    const phone = document.getElementById("newPhone").value.trim();
+    if(!name||!cls){alert("İsim ve sınıf girin."); return;}
+    const exists = students.some(s=>s.name.toLowerCase()===name.toLowerCase());
+    if(exists){alert("Öğrenci zaten var."); return;}
+    const newStudent = {name,class:cls,phone,status:""};
+    await setDoc(doc(db,"students",name),newStudent);
+    students.push(newStudent); renderClassButtons(); renderStudentsTable();
+    document.getElementById("newName").value=""; document.getElementById("newClass").value=""; document.getElementById("newPhone").value="";
+    document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none";
+  });
+  document.getElementById("btnRemove").addEventListener("click",async ()=>{
+    const name = document.getElementById("removeName").value.trim();
+    if(!name){alert("İsim girin"); return;}
+    const idx = students.findIndex(s=>s.name.toLowerCase()===name.toLowerCase());
+    if(idx===-1){alert("Öğrenci bulunamadı"); return;}
+    await deleteDoc(doc(db,"students",students[idx].name));
+    students.splice(idx,1); renderClassButtons(); renderStudentsTable();
+    document.getElementById("removeName").value=""; document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none";
   });
 });
 </script>
