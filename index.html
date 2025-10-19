@@ -60,7 +60,6 @@ tbody tr:hover{background:rgba(0,0,0,0.03);}
 </div>
 
 <main>
-  <!-- Öğretmen yoklama paneli -->
   <section class="panel" id="yoklamaPanel">
     <h3>Etüt Yoklama Listesi</h3>
     <button class="btn btn-primary" id="btnPanel">Öğrenci Ekle / Çıkar</button>
@@ -73,7 +72,6 @@ tbody tr:hover{background:rgba(0,0,0,0.03);}
     </div>
   </section>
 
-  <!-- Veli görünümü -->
   <section class="panel" id="parentTableWrap">
     <input type="text" id="parentSearch" class="parent-search" placeholder="Öğrenci ara..."/>
     <div class="parent-cards" id="parentCards"></div>
@@ -185,11 +183,18 @@ document.addEventListener("DOMContentLoaded",()=>{
   const passwordPanel = document.getElementById("passwordPanel");
   const mainPanel = document.querySelector("main");
 
-  document.getElementById("teacherBtn").addEventListener("click",()=>{loginPanel.style.display="none"; passwordPanel.style.display="flex";});
+  document.getElementById("teacherBtn").addEventListener("click",()=>{
+    passwordPanel.style.display="flex"; 
+    passwordPanel.style.flexDirection="column";
+    passwordPanel.style.alignItems="center";
+  });
+
   document.getElementById("teacherLoginBtn").addEventListener("click", async ()=>{
     const pw = document.getElementById("teacherPassword").value;
     if(pw==="elit"){
-      passwordPanel.style.display="none"; mainPanel.style.display="block"; isParentMode=false;
+      loginPanel.style.display="none"; 
+      mainPanel.style.display="block"; 
+      isParentMode=false;
       document.getElementById("yoklamaPanel").style.display="block";
       document.getElementById("parentTableWrap").style.display="none";
       await loadStudents();
@@ -197,7 +202,9 @@ document.addEventListener("DOMContentLoaded",()=>{
   });
 
   document.getElementById("parentBtn").addEventListener("click",()=>{
-    loginPanel.style.display="none"; mainPanel.style.display="block"; isParentMode=true;
+    loginPanel.style.display="none"; 
+    mainPanel.style.display="block"; 
+    isParentMode=true;
     document.getElementById("yoklamaPanel").style.display="none";
     document.getElementById("parentTableWrap").style.display="block";
     loadStudents();
