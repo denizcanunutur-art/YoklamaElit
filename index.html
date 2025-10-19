@@ -9,7 +9,6 @@
 *{box-sizing:border-box;margin:0;padding:0;font-family:"Montserrat",Arial,sans-serif;}
 body,html{height:100%;margin:0;}
 body{background:url('IMG_4035.JPG') center/cover no-repeat;background-size:cover;color:#222;display:flex;justify-content:center;align-items:center;}
-.blur-bg{position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);z-index:-1;}
 #loginPanel{background:rgba(255,255,255,0.95);padding:40px 30px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,0.3);text-align:center;max-width:360px;width:90%;}
 #loginPanel img{width:120px;height:auto;margin-bottom:20px;}
 #loginPanel h2{margin-bottom:24px;font-size:24px;color:#222;font-weight:700;}
@@ -49,8 +48,6 @@ tbody tr:hover{background:rgba(0,0,0,0.03);}
 </head>
 <body>
 
-<div class="blur-bg"></div>
-
 <div id="loginPanel">
   <img src="elit_logo.png" alt="Elit Logo">
   <h2>Giriş Seçenekleri</h2>
@@ -84,7 +81,7 @@ tbody tr:hover{background:rgba(0,0,0,0.03);}
   </section>
 </main>
 
-<!-- Öğrenci ekleme paneli (değişmedi) -->
+<!-- Öğrenci ekleme paneli -->
 <div id="overlay"></div>
 <div id="panel" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="panel-inner">
@@ -127,7 +124,6 @@ let activeClassFilter = null;
 let students = [];
 let statuses = {};
 
-// --- Öğrenci yükleme ---
 async function loadStudents(){
   students = [];
   const querySnapshot = await getDocs(collection(db,"students"));
@@ -140,7 +136,6 @@ async function loadStudents(){
   else { renderClassButtons(); renderStudentsTable(); document.getElementById("yoklamaPanel").style.display="block";}
 }
 
-// --- Durum güncelleme ---
 async function updateStatus(name,newStatus){
   statuses[name] = newStatus;
   const studentRef = doc(db,"students",name);
@@ -149,7 +144,6 @@ async function updateStatus(name,newStatus){
   else renderStudentsTable();
 }
 
-// --- Render ---
 function renderClassButtons(){
   const container = document.getElementById("classButtons"); container.innerHTML="";
   const classes = [...new Set(students.map(s=>s.class))].sort();
@@ -157,7 +151,7 @@ function renderClassButtons(){
     const btn = document.createElement("button");
     btn.textContent = cls; btn.className="btn-class";
     if(activeClassFilter===cls){btn.style.backgroundColor="var(--blue)";btn.style.color="#fff";}
-    btn.addEventListener("click",()=>{ activeClassFilter = (activeClassFilter===cls)?null:cls; renderStudentsTable(); renderClassButtons(); });
+    btn.addEventListener("click",()=>{ activeClassFilter = (activeClassFilter===cls)?null:cls; renderClassButtons(); renderStudentsTable(); });
     container.appendChild(btn);
   });
 }
@@ -165,68 +159,62 @@ function renderClassButtons(){
 function renderStudentsTable(){
   const tbody = document.querySelector("#studentsTable tbody"); tbody.innerHTML="";
   students.filter(s=>!activeClassFilter||s.class===activeClassFilter).forEach(s=>{
-    const tr = document.createElement("tr");
-    const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent = s.name;
-    const tdClass = document.createElement("td"); tdClass.textContent = s.class;
-    const tdStatus = document.createElement("td"); tdStatus.className="status-cell";
-    const st = statuses[s.name] || "";
-    tdStatus.classList.remove("status-empty","status-present","status-absent");
+    const tr=document.createElement("tr");
+    const tdName=document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
+    const tdClass=document.createElement("td"); tdClass.textContent=s.class;
+    const tdStatus=document.createElement("td"); tdStatus.className="status-cell";
+    const st = statuses[s.name]||"";
+    tdStatus.classList.remove("status-empty","status-absent","status-present");
     if(!st) tdStatus.classList.add("status-empty");
-    else if(st==="present") tdStatus.classList.add("status-present");
     else if(st==="absent") tdStatus.classList.add("status-absent");
-    tdStatus.textContent = st ? (st==="absent"?"Yok":"Var") : "-";
-    tdStatus.addEventListener("click",()=> toggleStatus(s.name));
+    else if(st==="present") tdStatus.classList.add("status-present");
+    tdStatus.textContent = st ? (st==="absent"?"Yok":"Var"):"-";
+    tdStatus.addEventListener("click",()=>{ let next=(!st)?"absent":(st==="absent"?"present":null); updateStatus(s.name,next); });
     tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
     tbody.appendChild(tr);
   });
 }
 
-function toggleStatus(name){
-  const cur = statuses[name];
-  if(!cur) updateStatus(name,"absent");
-  else if(cur==="absent") updateStatus(name,"present");
-  else updateStatus(name,"");
-}
-
-// --- Veli kartları ---
+// Parent rendering
 function renderParentCards(){
   const container = document.getElementById("parentCards"); container.innerHTML="";
   const searchVal = document.getElementById("parentSearch").value.toLowerCase();
   students.filter(s=>s.name.toLowerCase().includes(searchVal)).forEach(s=>{
     const div = document.createElement("div"); div.className="parent-card";
-    const statusDot = document.createElement("span"); statusDot.className="status-dot";
-    if(statuses[s.name]==="present") statusDot.classList.add("status-present");
-    else statusDot.classList.add("status-absent");
-    div.innerHTML = `${s.name}<br/>${s.class}`; div.prepend(statusDot);
+    const dot = document.createElement("span"); dot.className="status-dot"; dot.classList.add(statuses[s.name]==="present"?"status-present":"status-absent");
+    const nameEl = document.createElement("div"); nameEl.textContent=s.name;
+    const classEl = document.createElement("div"); classEl.textContent=s.class;
+    div.appendChild(dot); div.appendChild(nameEl); div.appendChild(classEl);
     container.appendChild(div);
   });
 }
 
-// --- Event listener ---
 document.addEventListener("DOMContentLoaded",()=>{
+  // Login buttons
   const loginPanel = document.getElementById("loginPanel");
+  const teacherBtn = document.getElementById("teacherBtn");
+  const parentBtn = document.getElementById("parentBtn");
   const passwordPanel = document.getElementById("passwordPanel");
-  const mainPanel = document.querySelector("main");
+  const teacherLoginBtn = document.getElementById("teacherLoginBtn");
+  const teacherPassword = document.getElementById("teacherPassword");
 
-  document.getElementById("teacherBtn").addEventListener("click",()=>{ passwordPanel.style.display="flex"; passwordPanel.style.flexDirection="column"; passwordPanel.style.alignItems="center"; });
-
-  document.getElementById("teacherLoginBtn").addEventListener("click", async ()=>{
-    const pw = document.getElementById("teacherPassword").value;
-    if(pw==="elit"){
-      loginPanel.style.display="none"; mainPanel.style.display="block"; isParentMode=false;
-      document.getElementById("yoklamaPanel").style.display="block";
-      document.getElementById("parentTableWrap").style.display="none";
-      await loadStudents();
+  teacherBtn.addEventListener("click",()=>{ passwordPanel.style.display="flex"; });
+  parentBtn.addEventListener("click",()=>{
+    isParentMode = true;
+    loginPanel.style.display="none";
+    document.getElementById("parentTableWrap").style.display="block";
+    loadStudents();
+  });
+  teacherLoginBtn.addEventListener("click",()=>{
+    if(teacherPassword.value==="elit"){
+      isParentMode = false;
+      loginPanel.style.display="none";
+      loadStudents();
     } else alert("Şifre yanlış!");
   });
 
-  document.getElementById("parentBtn").addEventListener("click",()=>{
-    loginPanel.style.display="none"; mainPanel.style.display="block"; isParentMode=true;
-    document.getElementById("yoklamaPanel").style.display="none";
-    document.getElementById("parentTableWrap").style.display="block";
-    loadStudents();
-    document.getElementById("parentSearch").addEventListener("input",renderParentCards);
-  });
+  // Parent search
+  document.getElementById("parentSearch").addEventListener("input",renderParentCards);
 
   // Öğrenci yönetim paneli
   document.getElementById("btnPanel").addEventListener("click",()=>{ document.getElementById("overlay").style.display="block"; document.getElementById("panel").style.display="block"; });
