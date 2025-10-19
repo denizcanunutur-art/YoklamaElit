@@ -175,7 +175,6 @@ function renderStudentsTable(){
   });
 }
 
-// Parent rendering
 function renderParentCards(){
   const container = document.getElementById("parentCards"); container.innerHTML="";
   const searchVal = document.getElementById("parentSearch").value.toLowerCase();
@@ -190,7 +189,6 @@ function renderParentCards(){
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
-  // Login buttons
   const loginPanel = document.getElementById("loginPanel");
   const teacherBtn = document.getElementById("teacherBtn");
   const parentBtn = document.getElementById("parentBtn");
@@ -213,7 +211,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     } else alert("Şifre yanlış!");
   });
 
-  // Parent search
   document.getElementById("parentSearch").addEventListener("input",renderParentCards);
 
   // Öğrenci yönetim paneli
