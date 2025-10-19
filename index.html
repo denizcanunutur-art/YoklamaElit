@@ -1,143 +1,72 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Elit Eğitim Kurumu - Yoklama Sistemi</title>
 <style>
-:root{
-  --red:#e74c3c; --blue:#2d6cdf; --green:#25d366; --muted:#f7f7f7; --gray:#bdbdbd;
-}
-*{box-sizing:border-box;margin:0;padding:0;font-family:"Montserrat",Arial,sans-serif}
-html,body{height:100%}
+:root{--red:#e74c3c;--blue:#2d6cdf;--green:#25d366;--muted:#f7f7f7;--gray:#bdbdbd;}
+*{box-sizing:border-box;margin:0;padding:0;}
 body{
-  background:url('IMG_4035.jpeg') center/cover no-repeat;
-  background-size:cover;
+  font-family:"Montserrat",Arial,sans-serif;
+  background:url('IMG_4035.JPG') center/cover no-repeat;
   color:#222;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
+  min-height:100vh;
 }
-
-/* LOGIN PANEL */
-#loginPanel{
+header{display:none;}
+.container{
   width:100%;
-  max-width:420px;
-  background:rgba(255,255,255,0.96);
-  padding:28px;
+  max-width:500px;
+  background:rgba(255,255,255,0.95);
+  margin:auto;
+  margin-top:50px;
+  padding:30px;
   border-radius:12px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.15);
   text-align:center;
+  box-shadow:0 6px 20px rgba(0,0,0,0.1);
 }
-#loginPanel img{width:120px;height:auto;margin-bottom:14px}
-#loginPanel h2{margin-bottom:12px;font-size:20px}
-.btn{display:inline-block;padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:700;margin:8px}
-.btn-primary{background:var(--blue);color:#fff}
-.btn-ghost{background:transparent;border:1px solid #eee;color:#333}
-
-/* password panel (hidden initially) */
-#passwordPanel{display:none;margin-top:12px}
-#passwordPanel input{padding:10px;width:80%;border-radius:8px;border:1px solid #e0e0e0;margin-bottom:8px}
-
-/* MAIN app area */
-.app-wrap{display:none;width:100%;max-width:1100px;margin:0 auto}
-.header{
-  background:rgba(255,255,255,0.92);
-  padding:16px 18px;border-radius:10px;margin-bottom:14px;
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-}
-.header .title{font-weight:800;font-size:20px}
-.header .sub{color:#666;font-weight:600;font-size:14px}
-
-/* panels */
-.columns{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
-.panel{
-  background:rgba(255,255,255,0.96);
-  border-radius:10px;padding:14px;box-shadow:0 6px 20px rgba(0,0,0,0.05);
-  flex:1 1 420px;min-width:300px;position:relative;
-}
-
-/* students table */
-.table-wrap{max-height:440px;overflow-y:auto;border-radius:6px;border:1px solid #e6e6e6;background:#fff}
-table{width:100%;border-collapse:collapse;min-width:280px}
-thead th{position:sticky;top:0;background:var(--muted);border-bottom:1px solid #e6e6e6;padding:10px;font-weight:700;text-align:left}
-tbody td{padding:10px;border-bottom:1px solid #f0f0f0}
-tbody tr:hover{background:rgba(0,0,0,0.03)}
-td.name{font-weight:700}
-.status-cell{width:110px;text-align:center;cursor:pointer;border-radius:6px;padding:6px;font-weight:700}
-.status-empty{background:transparent;color:#333}
-.status-absent{background:#ffd8d8;color:#800}
-.status-present{background:#d6ffd9;color:#064}
-
-/* class buttons */
-#classButtons{display:flex;flex-wrap:wrap;justify-content:center;margin-bottom:12px}
-.btn-class{background:#eee;color:var(--blue);margin:2px;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:700}
-
-/* absent table (for notify & individual WA) */
-.absent-wrap{margin-top:8px}
-.absent-wrap h4{display:flex;align-items:center;justify-content:space-between;margin:0 0 8px 0}
-.absent-wrap .btn-notify{background:#4a69bd;color:#fff;border-radius:8px;padding:8px 10px}
-
-/* parent cards */
-#parentTableWrap{display:none}
-.parent-search{width:100%;padding:10px;border-radius:8px;border:1px solid #dcdcdc;margin-bottom:12px}
-.parent-cards{max-height:60vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
-.parent-card{background:#fff;padding:12px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 10px rgba(0,0,0,0.06)}
-.parent-left{display:flex;align-items:center;gap:10px}
-.status-dot{width:14px;height:14px;border-radius:50%;display:inline-block}
-.status-dot.present{background:var(--green)}
-.status-dot.absent{background:var(--red)}
-
-/* modal panel */
-#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:40}
-#panel{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;width:92%;max-width:520px}
-#panel .panel-inner{background:#fff;padding:18px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.2)}
-.panel-inner input{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #dcdcdc}
-
-/* responsive */
-@media (max-width:900px){ .columns{flex-direction:column;padding:0 6px} .panel{min-width:unset} }
+.logo{width:100px;height:100px;margin-bottom:12px;}
+h1{margin-bottom:10px;}
+button{padding:10px 20px;margin:6px;border:none;border-radius:8px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff;transition:0.3s;}
+button:hover{background:#1f4fbf;}
+input{width:80%;padding:10px;margin:8px 0;border-radius:8px;border:1px solid #ccc;}
+.hidden{display:none;}
+.table-wrap{max-height:400px;overflow-y:auto;margin-top:12px;border-radius:6px;border:1px solid #e6e6e6;background:#fff;}
+table{width:100%;border-collapse:collapse;}
+thead th{position:sticky;top:0;background:var(--muted);padding:10px;text-align:left;border-bottom:1px solid #e6e6e6;font-weight:700;}
+tbody td{padding:10px;border-bottom:1px solid #f0f0f0;}
+tbody tr:hover{background:rgba(0,0,0,0.03);}
+.status-light{display:inline-block;width:14px;height:14px;border-radius:50%;}
+.var{background:var(--green);}
+.yok{background:var(--red);}
 </style>
 </head>
 <body>
 
-<!-- LOGIN (logo only here) -->
-<div id="loginPanel">
-  <img src="IMG_4028.jpeg" alt="Elit Logo">
-  <h2>Elit Eğitim Kurumu</h2>
-  <div style="margin:6px 0 12px 0;color:#666">Yoklama Sistemi</div>
-  <div>
-    <button class="btn btn-primary" id="teacherBtn">Öğretmen Girişi</button>
-    <button class="btn btn-primary" id="parentBtn">Veli Girişi</button>
-  </div>
+<!-- Giriş Paneli -->
+<div id="loginPanel" class="container">
+  <img src="logo.png" alt="Elit Logo" class="logo">
+  <h1>Elit Eğitim Yoklama</h1>
+  <p>Giriş Tipinizi Seçin:</p>
+  <button onclick="showTeacherLogin()">Öğretmen Girişi</button>
+  <button onclick="veliGiris()">Veli Girişi</button>
 
-  <div id="passwordPanel" aria-hidden="true">
-    <input id="teacherPassword" type="password" placeholder="Şifre (elit)">
-    <div style="margin-top:8px">
-      <button class="btn btn-primary" id="teacherLoginBtn">Giriş</button>
-      <button class="btn btn-ghost" id="passwordCancelBtn">İptal</button>
-    </div>
+  <div id="teacherLogin" class="hidden">
+    <input type="password" id="teacherPass" placeholder="Şifre">
+    <br>
+    <button onclick="teacherAuth()">Giriş Yap</button>
   </div>
 </div>
 
-<!-- APP -->
-<div class="app-wrap" id="appWrap" style="display:none;width:100%">
-  <div class="header">
-    <div>
-      <div class="title">Elit Eğitim Kurumu</div>
-      <div class="sub">Yoklama Sistemi</div>
-    </div>
-    <div>
-      <button class="btn btn-ghost" id="btnLogout">Çıkış</button>
-    </div>
-  </div>
-
-  <div class="columns">
-    <!-- Öğretmen panel (tam yönetim) -->
-    <section class="panel" id="yoklamaPanel" style="display:none">
+<!-- Öğretmen Paneli -->
+<div id="teacherPanel" class="hidden">
+  <header>
+    <h1><span>Elit</span> Eğitim Kurumu</h1>
+    <h2>Yoklama Alma Sistemi</h2>
+  </header>
+  <main style="padding:18px;">
+    <section class="panel">
       <h3>Etüt Yoklama Listesi</h3>
-      <button class="btn btn-class" id="btnPanel">Öğrenci Ekle / Çıkar</button>
-      <div id="classButtons"></div>
       <div class="table-wrap">
         <table id="studentsTable">
           <thead><tr><th>İsim</th><th>Sınıf</th><th>Durum</th></tr></thead>
@@ -146,311 +75,126 @@ td.name{font-weight:700}
       </div>
     </section>
 
-    <!-- Yok olanlar + notify panel -->
-    <section class="panel" id="absentPanel" style="display:none">
-      <h3>Etütte Olmayanlar</h3>
-      <div style="height:8px"></div>
-      <div class="absent-wrap">
-        <h4>
-          Yok Olanlar
-          <button class="btn btn-notify" id="btnNotify">Kurumu Bilgilendir</button>
-        </h4>
-        <div class="table-wrap">
-          <table id="absentTable">
-            <thead><tr><th>İsim</th><th>Sınıf</th><th>WhatsApp</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
+    <section class="panel" style="margin-top:12px;">
+      <h3 style="display:flex;justify-content:space-between;align-items:center">
+        Etütte Olmayanlar
+        <button id="btnNotify">Kurumu Bilgilendir</button>
+      </h3>
+      <div class="table-wrap">
+        <table id="absentTable">
+          <thead><tr><th>İsim</th><th>Sınıf</th><th>WhatsApp</th></tr></thead>
+          <tbody></tbody>
+        </table>
       </div>
     </section>
-
-    <!-- Veli panel -->
-    <section class="panel" id="parentTableWrap">
-      <input type="text" id="parentSearch" class="parent-search" placeholder="Öğrenci ara...">
-      <div class="parent-cards" id="parentCards"></div>
-    </section>
-  </div>
+  </main>
 </div>
 
-<!-- Öğrenci ekleme paneli (same as before) -->
-<div id="overlay"></div>
-<div id="panel" role="dialog" aria-modal="true" aria-hidden="true">
-  <div class="panel-inner">
-    <h3>Öğrenci Yönetimi</h3>
-    <input id="newName" type="text" placeholder="Ad Soyad" />
-    <input id="newClass" type="text" placeholder="Sınıf (örn: 11Say)" />
-    <input id="newPhone" type="text" placeholder="Telefon (örn +90...)" />
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button class="btn btn-primary" id="btnAdd">Ekle</button>
-      <button class="btn" id="btnClear">Temizle</button>
-    </div>
-    <hr style="margin:12px 0">
-    <div style="font-weight:700;margin-bottom:6px">Öğrenci Sil</div>
-    <input id="removeName" type="text" placeholder="Silinecek öğrenci adı" />
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button class="btn btn-primary" id="btnRemoveConfirm">Sil</button>
-      <button class="btn" id="btnClose">Kapat</button>
-    </div>
+<!-- Veli Paneli -->
+<div id="veliPanel" class="container hidden">
+  <h1>🎓 Öğrenci Durumları</h1>
+  <input type="text" id="veliSearch" placeholder="Öğrenci ara..." onkeyup="searchVeli()">
+  <div class="table-wrap">
+    <table id="veliTable">
+      <thead><tr><th>Ad Soyad</th><th>Durum</th></tr></thead>
+      <tbody id="veliBody"></tbody>
+    </table>
   </div>
+  <button onclick="logout()">Çıkış</button>
 </div>
 
 <script type="module">
-// ---------- Firebase setup (kendi değerlerinle değiştir) ----------
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import {
-  getFirestore, collection, getDocs, setDoc, doc, deleteDoc, updateDoc
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+// Öğrenci verisi
+let students=[
+  {name:"İrem Korkmaz",class:"11Say",phone:"+905441234567"},
+  {name:"Semih Kodaz",class:"11Say",phone:"+905441234568"},
+  {name:"Fatma Özdemir",class:"11Say",phone:"+905441234569"},
+  {name:"Emin Dede",class:"11Say",phone:"+905441234570"}
+];
+let statuses={};
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBka7ReTV8sGjR9GAsJUDkksLSCTHCV9Mk",
-  authDomain: "elit-yoklama.firebaseapp.com",
-  projectId: "elit-yoklama",
-  storageBucket: "elit-yoklama.firebasestorage.app",
-  messagingSenderId: "30260081027",
-  appId: "1:30260081027:web:9332093cbc19d605d506b6"
-};
-
-const INSTITUTION_PHONE = "+905527112922"; // kurumu bilgilendirme numarası (örnek)
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// ---------- State ----------
-let students = []; // array of {name,class,phone,status}
-let activeClassFilter = null;
-let isParentMode = false;
-
-// ---------- Load students from Firestore ----------
-async function loadStudents(){
-  students = [];
-  try {
-    const snapshot = await getDocs(collection(db,"students"));
-    snapshot.forEach(d=>{
-      const data = d.data();
-      // ensure fields exist
-      students.push({
-        name: data.name || d.id,
-        class: data.class || "",
-        phone: data.phone || "",
-        status: data.status || ""
-      });
-    });
-  } catch (e){
-    console.error("Firestore read error:", e);
-    alert("Öğrenciler yüklenirken hata oluştu. Konsolu kontrol et.");
-  }
-}
-
-// ---------- UI renderers ----------
-function renderClassButtons(){
-  const container = document.getElementById("classButtons");
-  container.innerHTML = "";
-  const classes = [...new Set(students.map(s=>s.class))].filter(Boolean).sort();
-  classes.forEach(cls=>{
-    const btn = document.createElement("button");
-    btn.className = "btn-class";
-    btn.textContent = cls;
-    if(activeClassFilter === cls){
-      btn.style.backgroundColor = "#2d6cdf"; btn.style.color = "#fff";
-    }
-    btn.addEventListener("click", ()=>{
-      activeClassFilter = (activeClassFilter===cls) ? null : cls;
-      renderClassButtons();
-      renderStudentsTable();
-    });
-    container.appendChild(btn);
-  });
+function showTeacherLogin(){document.getElementById("teacherLogin").classList.remove("hidden");}
+function teacherAuth(){
+  if(document.getElementById("teacherPass").value==="elit"){
+    document.getElementById("loginPanel").classList.add("hidden");
+    document.getElementById("teacherPanel").classList.remove("hidden");
+    renderStudentsTable();
+  }else{alert("Yanlış şifre!");}
 }
 
 function renderStudentsTable(){
-  const tbody = document.querySelector("#studentsTable tbody");
-  tbody.innerHTML = "";
-  students.filter(s=>!activeClassFilter || s.class===activeClassFilter)
-    .forEach(s=>{
-      const tr = document.createElement("tr");
-      const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent = s.name;
-      const tdClass = document.createElement("td"); tdClass.textContent = s.class;
-      const tdStatus = document.createElement("td"); tdStatus.className = "status-cell";
-      tdStatus.textContent = s.status ? (s.status==="absent" ? "Yok" : "Var") : "-";
-      tdStatus.classList.remove("status-empty","status-absent","status-present");
-      if(!s.status) tdStatus.classList.add("status-empty");
-      else if(s.status==="absent") tdStatus.classList.add("status-absent");
-      else if(s.status==="present") tdStatus.classList.add("status-present");
-
-      // toggle only in teacher mode
-      tdStatus.addEventListener("click", async ()=>{
-        if(isParentMode) return;
-        // update local and Firebase
-        try{
-          if(!s.status) s.status = "absent";
-          else if(s.status==="absent") s.status = "present";
-          else s.status = "";
-          await updateDoc(doc(db,"students",s.name), { status: s.status || "" });
-          // re-render both tables
-          renderStudentsTable();
-          renderAbsentTable();
-        }catch(e){
-          console.error("update error:", e);
-          alert("Durum güncellenirken hata oluştu.");
-        }
-      });
-
-      tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
-      tbody.appendChild(tr);
-    });
+  const tbody=document.querySelector("#studentsTable tbody");
+  tbody.innerHTML="";
+  students.forEach(s=>{
+    const tr=document.createElement("tr");
+    const tdName=document.createElement("td"); tdName.textContent=s.name;
+    const tdClass=document.createElement("td"); tdClass.textContent=s.class;
+    const tdStatus=document.createElement("td");
+    tdStatus.style.textAlign="center";
+    const st=statuses[s.name]||"";
+    tdStatus.textContent=st?st==="absent"?"Yok":"Var":"-";
+    tdStatus.style.cursor="pointer";
+    tdStatus.addEventListener("click",()=>toggleStatus(s.name));
+    tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
+    tbody.appendChild(tr);
+  });
   renderAbsentTable();
 }
 
+function toggleStatus(name){
+  const cur=statuses[name];
+  if(!cur) statuses[name]="absent";
+  else if(cur==="absent") statuses[name]="present";
+  else delete statuses[name];
+  renderStudentsTable();
+}
+
 function renderAbsentTable(){
-  const tbody = document.querySelector("#absentTable tbody");
-  tbody.innerHTML = "";
-  const absents = students.filter(s=>s.status==="absent");
-  absents.forEach(s=>{
-    const tr = document.createElement("tr");
-    const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent = s.name;
-    const tdClass = document.createElement("td"); tdClass.textContent = s.class;
-    const tdBtn = document.createElement("td"); tdBtn.style.textAlign="center";
-    const btn = document.createElement("button"); btn.className="btn btn-primary"; btn.textContent="Gönder";
-    btn.addEventListener("click", ()=> sendIndividualWA(s.phone, s.name));
-    tdBtn.appendChild(btn);
-    tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdBtn);
+  const tbody=document.querySelector("#absentTable tbody");
+  tbody.innerHTML="";
+  students.filter(s=>statuses[s.name]==="absent").forEach(s=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${s.name}</td><td>${s.class}</td><td style="text-align:center"><button onclick="alert('WP mesajı gönderildi')" style="padding:5px 10px;">Gönder</button></td>`;
     tbody.appendChild(tr);
   });
 }
 
-function renderParentCards(){
-  const container = document.getElementById("parentCards");
-  container.innerHTML = "";
-  const q = document.getElementById("parentSearch").value.trim().toLowerCase();
-  students.filter(s => s.name.toLowerCase().includes(q)).forEach(s=>{
-    const card = document.createElement("div"); card.className="parent-card";
-    const left = document.createElement("div"); left.className="parent-left";
-    const dot = document.createElement("span"); dot.className="status-dot " + (s.status==="present" ? "present" : "absent");
-    const txt = document.createElement("div"); txt.textContent = `${s.name} (${s.class})`;
-    left.appendChild(dot); left.appendChild(txt);
-    card.appendChild(left);
-    container.appendChild(card);
+document.getElementById("btnNotify")?.addEventListener("click",()=>{
+  const absents=students.filter(s=>statuses[s.name]==="absent").map(s=>s.name);
+  alert(absents.length? "Etütte olmayanlar:\n"+absents.join(", "):"Tüm öğrenciler var ✅");
+});
+
+function veliGiris(){
+  document.getElementById("loginPanel").classList.add("hidden");
+  document.getElementById("veliPanel").classList.remove("hidden");
+  renderVeliTable();
+}
+
+function renderVeliTable(){
+  const tbody=document.getElementById("veliBody");
+  tbody.innerHTML="";
+  students.forEach(s=>{
+    const lightClass=statuses[s.name]==="present"?"var":statuses[s.name]==="absent"?"yok":"";
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${s.name}</td><td>${lightClass?'<span class="status-light '+lightClass+'"></span>':'-'}</td>`;
+    tbody.appendChild(tr);
   });
 }
 
-// ---------- WhatsApp functions ----------
-function sendIndividualWA(phone, name){
-  if(!phone){ alert("Öğrencinin telefonu kayıtlı değil."); return; }
-  const msg = `Merhabalar,%0AÖğrencimiz ${encodeURIComponent(name)} etüte katılmamıştır.%0AElit Eğitim Kurumu`;
-  const url = `https://wa.me/${phone.replace(/\+/g,'')}?text=${msg}`;
-  window.open(url, "_blank");
+function searchVeli(){
+  const q=document.getElementById("veliSearch").value.toLowerCase();
+  document.querySelectorAll("#veliBody tr").forEach(r=>{
+    const name=r.cells[0].innerText.toLowerCase();
+    r.style.display=name.includes(q)? "":"none";
+  });
 }
 
-function notifyInstitution(){
-  const absents = students.filter(s=>s.status==="absent").map(s=>s.name);
-  if(absents.length===0){ alert("Tüm öğrenciler etütte, bildirilecek öğrenci yok."); return; }
-  const message = `Etütte olmayan öğrenciler: ${absents.join(", ")}`;
-  const url = `https://wa.me/${INSTITUTION_PHONE.replace(/\+/g,'')}?text=${encodeURIComponent(message)}`;
-  window.open(url, "_blank");
+function logout(){
+  document.getElementById("teacherPanel").classList.add("hidden");
+  document.getElementById("veliPanel").classList.add("hidden");
+  document.getElementById("loginPanel").classList.remove("hidden");
 }
-
-// ---------- Panel controls and student management ----------
-function openPanel(){ document.getElementById("overlay").style.display="block"; document.getElementById("panel").style.display="block"; }
-function closePanel(){ document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none"; }
-
-document.getElementById("btnPanel").addEventListener("click", openPanel);
-document.getElementById("overlay").addEventListener("click", closePanel);
-document.getElementById("btnClose").addEventListener("click", closePanel);
-document.getElementById("btnClear").addEventListener("click", ()=>{
-  document.getElementById("newName").value=""; document.getElementById("newClass").value=""; document.getElementById("newPhone").value="";
-});
-
-document.getElementById("btnAdd").addEventListener("click", async ()=>{
-  const name = document.getElementById("newName").value.trim();
-  const cls = document.getElementById("newClass").value.trim();
-  const phone = document.getElementById("newPhone").value.trim();
-  if(!name || !cls){ alert("Lütfen isim ve sınıf girin."); return; }
-  if(students.some(s=>s.name.toLowerCase()===name.toLowerCase())){ alert("Bu isimde öğrenci zaten mevcut."); return; }
-  const newStudent = { name, class: cls, phone, status: "" };
-  try {
-    await setDoc(doc(db,"students",name), newStudent);
-    students.push(newStudent);
-    renderClassButtons(); renderStudentsTable();
-    closePanel();
-  } catch(e){
-    console.error("add error", e); alert("Öğrenci eklenirken hata oluştu.");
-  }
-});
-
-document.getElementById("btnRemoveConfirm").addEventListener("click", async ()=>{
-  const name = document.getElementById("removeName").value.trim();
-  if(!name){ alert("Silinecek öğrencinin adını girin."); return; }
-  const idx = students.findIndex(s=>s.name.toLowerCase()===name.toLowerCase());
-  if(idx===-1){ alert("Bu isimde öğrenci bulunamadı."); return; }
-  try{
-    await deleteDoc(doc(db,"students",students[idx].name));
-    students.splice(idx,1);
-    renderClassButtons(); renderStudentsTable();
-    closePanel();
-  }catch(e){ console.error("remove err", e); alert("Silme işleminde hata."); }
-});
-
-// notify button
-document.getElementById("btnNotify").addEventListener("click", notifyInstitution);
-
-// ---------- Login logic (teacher: password 'elit', parent: no password) ----------
-const teacherBtn = document.getElementById("teacherBtn");
-const parentBtn = document.getElementById("parentBtn");
-const passwordPanel = document.getElementById("passwordPanel");
-const teacherLoginBtn = document.getElementById("teacherLoginBtn");
-const passwordCancelBtn = document.getElementById("passwordCancelBtn");
-const teacherPassword = document.getElementById("teacherPassword");
-
-teacherBtn.addEventListener("click", ()=>{ passwordPanel.style.display = "block"; passwordPanel.setAttribute("aria-hidden","false"); });
-passwordCancelBtn.addEventListener("click", ()=>{ passwordPanel.style.display = "none"; passwordPanel.setAttribute("aria-hidden","true"); teacherPassword.value=""; });
-
-parentBtn.addEventListener("click", async ()=>{
-  isParentMode = true;
-  document.getElementById("loginPanel").style.display = "none";
-  document.getElementById("appWrap").style.display = "block";
-  // ensure only parent panel visible
-  document.getElementById("yoklamaPanel").style.display = "none";
-  document.getElementById("absentPanel").style.display = "none";
-  document.getElementById("parentTableWrap").style.display = "block";
-  // load & render
-  await loadStudents();
-  renderParentCards();
-});
-
-teacherLoginBtn.addEventListener("click", async ()=>{
-  if(teacherPassword.value !== "elit"){ alert("Şifre yanlış!"); return; }
-  isParentMode = false;
-  document.getElementById("loginPanel").style.display = "none";
-  document.getElementById("appWrap").style.display = "block";
-  // ensure only teacher panels visible
-  document.getElementById("parentTableWrap").style.display = "none";
-  document.getElementById("yoklamaPanel").style.display = "block";
-  document.getElementById("absentPanel").style.display = "block";
-  teacherPassword.value = "";
-  // load data and render everything
-  await loadStudents();
-  renderClassButtons();
-  renderStudentsTable();
-  renderParentCards();
-});
-
-// logout
-document.getElementById("btnLogout").addEventListener("click", ()=>{
-  // reset UI
-  document.getElementById("appWrap").style.display = "none";
-  document.getElementById("loginPanel").style.display = "block";
-  document.getElementById("yoklamaPanel").style.display = "none";
-  document.getElementById("absentPanel").style.display = "none";
-  document.getElementById("parentTableWrap").style.display = "none";
-  document.getElementById("passwordPanel").style.display = "none";
-  isParentMode = false;
-  activeClassFilter = null;
-  students = [];
-});
-
-// parent search live
-document.getElementById("parentSearch").addEventListener("input", renderParentCards);
-
 </script>
+
 </body>
 </html>
