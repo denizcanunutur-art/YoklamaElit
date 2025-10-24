@@ -12,16 +12,62 @@ body{
   background:url('IMG_4035.JPG') center/cover no-repeat;
   color:#222;
 }
+
+/* --- HEADER --- */
 header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
   background:rgba(255,255,255,0.92);
   padding:20px 12px;
-  text-align:center;
   box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  position:relative;
 }
-header h1{margin:0;font-size:28px;font-weight:800}
+header h1, header h2{
+  margin:0;
+  text-align:center;
+  flex:1;
+}
 header h1 span{color:var(--red)}
 header h2{margin:6px 0 0 0;font-size:15px;color:#555;font-weight:600}
+.back-btn{
+  position:relative;
+  margin-right:auto;
+  background:#999;
+  color:#fff;
+  border:0;
+  border-radius:8px;
+  padding:8px 14px;
+  cursor:pointer;
+  font-weight:700;
+}
 
+/* --- ANA MENÜ --- */
+#selectionScreen{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+  background:rgba(255,255,255,0.85);
+  text-align:center;
+}
+.menu-btn{
+  background:var(--blue);
+  color:#fff;
+  border:0;
+  border-radius:10px;
+  padding:20px 40px;
+  margin:12px;
+  font-size:20px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 6px 15px rgba(0,0,0,0.15);
+  transition:transform 0.15s;
+}
+.menu-btn:hover{transform:scale(1.05)}
+
+/* --- MAIN PANEL --- */
 main{display:flex;gap:18px;padding:18px;flex-wrap:wrap;justify-content:center}
 .panel{background:rgba(255,255,255,0.96);border-radius:10px;padding:14px;box-shadow:0 6px 20px rgba(0,0,0,0.05);flex:1 1 420px;min-width:300px;position:relative}
 h3{margin:0 0 10px 0;font-size:18px}
@@ -53,51 +99,7 @@ td.name{font-weight:700}
 }
 .btn-class{background:#eee;color:var(--blue);margin:2px;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:700}
 
-/* Ana menü */
-#selectionScreen{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
-  background:rgba(255,255,255,0.8);
-  text-align:center;
-}
-.menu-btn{
-  background:var(--blue);
-  color:#fff;
-  border:0;
-  border-radius:10px;
-  padding:20px 40px;
-  margin:12px;
-  font-size:20px;
-  font-weight:800;
-  cursor:pointer;
-  box-shadow:0 6px 15px rgba(0,0,0,0.15);
-  transition:transform 0.15s;
-}
-.menu-btn:hover{transform:scale(1.05)}
-
-/* Panel (modal) */
-#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:40}
-#panel{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;width:92%;max-width:520px}
-#panel .panel-inner{background:#fff;padding:18px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.2)}
-.panel-inner input{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #dcdcdc}
-
 #classButtons{display:flex;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
-
-.back-btn{
-  position:absolute;
-  top:18px;
-  left:18px;
-  background:#999;
-  color:#fff;
-  border:0;
-  border-radius:8px;
-  padding:8px 14px;
-  cursor:pointer;
-  font-weight:700;
-}
 
 @media (max-width:900px){
   main{flex-direction:column;padding:12px}
@@ -177,7 +179,7 @@ td.name{font-weight:700}
 </div>
 
 <script type="module">
-// --- Firebase ---
+// --- Firebase import ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
@@ -192,48 +194,46 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
 const INSTITUTION_PHONE = "+905527112922";
-let students = [];
-let activeClassFilter = null;
 
-// iki farklı yoklama durumu
+let activeClassFilter = null;
+let students = [];
 let dersStatuses = {};
 let etutStatuses = {};
-let currentMode = "etut"; // varsayılan etüt
+let currentType = null; // "ders" veya "etut"
 
-// --- Menü kontrolü ---
-document.getElementById("btnDers").addEventListener("click", () => startMode("ders"));
-document.getElementById("btnEtut").addEventListener("click", () => startMode("etut"));
-document.getElementById("btnBack").addEventListener("click", goBack);
-
-function startMode(mode){
-  currentMode = mode;
-  document.getElementById("selectionScreen").style.display="none";
-  document.getElementById("yoklamaContainer").style.display="block";
-  document.getElementById("panelTitle").textContent = (mode==="ders" ? "Ders Yoklama Sistemi" : "Etüt Yoklama Sistemi");
-  document.getElementById("yoklamaTypeTitle").textContent = (mode==="ders" ? "Ders Yoklama Listesi" : "Etüt Yoklama Listesi");
-  loadStudents();
-}
-
-function goBack(){
-  document.getElementById("selectionScreen").style.display="flex";
-  document.getElementById("yoklamaContainer").style.display="none";
-  activeClassFilter = null;
-}
-
-// --- Firebase öğrenci yükleme ---
-async function loadStudents() {
+// --- Öğrenci yükleme ---
+async function loadStudents(){
   students = [];
   const querySnapshot = await getDocs(collection(db, "students"));
-  querySnapshot.forEach((docSnap)=>{
+  querySnapshot.forEach(docSnap=>{
     students.push({...docSnap.data()});
   });
   renderClassButtons();
   renderStudentsTable();
 }
 
-// --- Render işlemleri ---
+// --- Menü seçim ---
+document.getElementById("btnDers").addEventListener("click", ()=>{
+  currentType="ders";
+  document.getElementById("selectionScreen").style.display="none";
+  document.getElementById("yoklamaContainer").style.display="block";
+  document.getElementById("yoklamaTypeTitle").textContent="Ders Yoklama Listesi";
+  renderStudentsTable();
+});
+document.getElementById("btnEtut").addEventListener("click", ()=>{
+  currentType="etut";
+  document.getElementById("selectionScreen").style.display="none";
+  document.getElementById("yoklamaContainer").style.display="block";
+  document.getElementById("yoklamaTypeTitle").textContent="Etüt Yoklama Listesi";
+  renderStudentsTable();
+});
+document.getElementById("btnBack").addEventListener("click", ()=>{
+  document.getElementById("yoklamaContainer").style.display="none";
+  document.getElementById("selectionScreen").style.display="flex";
+});
+
+// --- Render ---
 function renderClassButtons(){
   const container = document.getElementById("classButtons");
   container.innerHTML = "";
@@ -242,6 +242,7 @@ function renderClassButtons(){
     const btn = document.createElement("button");
     btn.textContent = cls;
     btn.className = "btn-class";
+    btn.style.color = "var(--blue)";
     if(activeClassFilter===cls){
       btn.style.backgroundColor = "var(--blue)";
       btn.style.color = "#fff";
@@ -258,42 +259,40 @@ function renderClassButtons(){
 function renderStudentsTable(){
   const tbody = document.querySelector("#studentsTable tbody");
   tbody.innerHTML = "";
-  const statusSet = currentMode==="ders" ? dersStatuses : etutStatuses;
+  const statuses = (currentType==="ders")?dersStatuses:etutStatuses;
   students.filter(s=>!activeClassFilter || s.class===activeClassFilter)
   .forEach(s=>{
     const tr = document.createElement("tr");
     const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
     const tdClass = document.createElement("td"); tdClass.textContent=s.class;
     const tdStatus = document.createElement("td"); tdStatus.className="status-cell";
-    const st = statusSet[s.name] || "";
+    const st = statuses[s.name] || "";
     tdStatus.classList.remove("status-empty","status-absent","status-present");
     if(!st) tdStatus.classList.add("status-empty");
     else if(st==="absent") tdStatus.classList.add("status-absent");
     else if(st==="present") tdStatus.classList.add("status-present");
     tdStatus.textContent = st ? (st==="absent"?"Yok":"Var") : "-";
     tdStatus.addEventListener("click", ()=> toggleStatus(s.name));
-    tr.appendChild(tdName);
-    tr.appendChild(tdClass);
-    tr.appendChild(tdStatus);
+    tr.appendChild(tdName); tr.appendChild(tdClass); tr.appendChild(tdStatus);
     tbody.appendChild(tr);
   });
   renderAbsentTable();
 }
 
 function toggleStatus(name){
-  const statusSet = currentMode==="ders" ? dersStatuses : etutStatuses;
-  const cur = statusSet[name];
-  if(!cur) statusSet[name]="absent";
-  else if(cur==="absent") statusSet[name]="present";
-  else delete statusSet[name];
+  const statuses = (currentType==="ders")?dersStatuses:etutStatuses;
+  const cur = statuses[name];
+  if(!cur) statuses[name]="absent";
+  else if(cur==="absent") statuses[name]="present";
+  else delete statuses[name];
   renderStudentsTable();
 }
 
 function renderAbsentTable(){
   const tbody = document.querySelector("#absentTable tbody");
   tbody.innerHTML = "";
-  const statusSet = currentMode==="ders" ? dersStatuses : etutStatuses;
-  const absents = students.filter(s=>statusSet[s.name]==="absent");
+  const statuses = (currentType==="ders")?dersStatuses:etutStatuses;
+  const absents = students.filter(s=>statuses[s.name]==="absent");
   absents.forEach(s=>{
     const tr = document.createElement("tr");
     const tdName = document.createElement("td"); tdName.className="name"; tdName.textContent=s.name;
@@ -309,21 +308,21 @@ function renderAbsentTable(){
 
 // --- WhatsApp ---
 function sendIndividualWA(phone,name){
-  const msg = `Merhabalar Öğrencimiz ${name} ${(currentMode==="ders"?"ders":"etüt")}e katılmamıştır, bilginize sunarız.%0AElit Eğitim Kurumu`;
+  const msg = `Merhabalar Öğrencimiz ${name} etüte katılmamıştır, bilginize sunarız.%0AElit Eğitim Kurumu`;
   const url = `https://wa.me/${phone.replace(/\+/g,'')}?text=${msg}`;
   window.open(url,"_blank");
 }
 
 function notifyInstitution(){
-  const statusSet = currentMode==="ders" ? dersStatuses : etutStatuses;
-  const absents = students.filter(s=>statusSet[s.name]==="absent").map(s=>s.name);
+  const statuses = (currentType==="ders")?dersStatuses:etutStatuses;
+  const absents = students.filter(s=>statuses[s.name]==="absent").map(s=>s.name);
   if(absents.length===0){ alert("Tüm öğrenciler katıldı, bildirilecek öğrenci yok."); return; }
-  const message = `${currentMode==="ders"?"Derste":"Etütte"} olmayan öğrenciler:\n\n${absents.join(", ")}`;
+  const message = `Yok olan öğrenciler:\n\n${absents.join(", ")}`;
   const url = `https://wa.me/${INSTITUTION_PHONE.replace(/\+/g,'')}?text=${encodeURIComponent(message)}`;
   window.open(url,"_blank");
 }
 
-// --- Panel kontrol ---
+// --- Panel kontrolleri ---
 function openPanel(){ document.getElementById("overlay").style.display="block"; document.getElementById("panel").style.display="block"; }
 function closePanel(){ document.getElementById("overlay").style.display="none"; document.getElementById("panel").style.display="none"; }
 function clearInputs(){ document.getElementById("newName").value=""; document.getElementById("newClass").value=""; document.getElementById("newPhone").value=""; }
@@ -363,6 +362,8 @@ document.addEventListener("DOMContentLoaded", ()=>{
   document.getElementById("btnAdd").addEventListener("click", addStudent);
   document.getElementById("btnRemove").addEventListener("click", removeStudent);
   document.getElementById("btnNotify").addEventListener("click", notifyInstitution);
+
+  loadStudents();
 });
 </script>
 </body>
